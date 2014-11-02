@@ -11,10 +11,19 @@ public class SimUser
 		this.userNo = usernum;
 		this.count = 1;
 	}
+	public SimUser (int usernum, int outlierflag){
+		this.userNo=usernum;
+		this.count=0;
+	}
 
 	public int getUserNo()
 	{
 		return this.userNo;
+	}
+	
+	public void setCount(int count)
+	{
+		this.count=count;
 	}
 	
 	public int getCount()

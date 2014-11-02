@@ -114,19 +114,35 @@ public class process {
 	public void buildClustedUserList (ArrayList<User> userList, ArrayList<Integer> unreliablelist){
 		for(int i=0; i<this.userNumber; i++){
 			User aUser = userList.get(i);
-			if(unreliablelist.contains(aUser.getUserNo()))
-				continue;
-			ClustedUser newClustedUser = new ClustedUser(aUser,unreliablelist);
+			ClustedUser newClustedUser;
+			//for outlier
+			if(unreliablelist.contains(aUser.getUserNo())){
+				newClustedUser = new ClustedUser(aUser.getUserNo(),1);
+			}
+			else{
+				newClustedUser = new ClustedUser(aUser,unreliablelist);
+			}
 			clustedUserList.add(newClustedUser);
 		}
 	}
 	
 	public void printclustedUserList(){
-		for(int i = 0;i < clustedUserList.size();i++)
+		for(int i = 0;i < 1;i++)
+//		for(int i = 0;i < clustedUserList.size();i++)
 		{
-			User temUser = userClustered.get(i);
-			ArrayList<UserSet> tempUserSet = temUser.getClusters();
-			System.out.println("user "+ i +"has "+tempUserSet.size() +" userSets:"+tempUserSet.toString());
+			ClustedUser tempUser = clustedUserList.get(i);
+			ArrayList<SimUser> tempSimUserlist = tempUser.getSimUserList();
+			if(tempSimUserlist.isEmpty()){
+				System.out.println("user "+ tempUser.getUserNo() +" is an outliser");
+			}
+			else{
+				System.out.println("user "+ tempUser.getUserNo() +" has "+tempSimUserlist.size() +" simuers");
+
+			}
+			for(int s =0; s<tempSimUserlist.size(); s++){
+				SimUser aSimUser = tempSimUserlist.get(s);
+				System.out.println("simuser:"+ aSimUser.getUserNo() + " has "+aSimUser.getCount()+" times");
+			}
 		}
 	}
 	
@@ -184,26 +200,28 @@ public class process {
 	
 			}
 		}
-		
-		tester.writeUser("userClusted.txt");
-		tester.buildClustedUserList(userClustered, unreliableUser);
-		System.out.println(clustedUserList.toString());
-/*		
+
 		KMeans kMeans2 = new KMeans(userCount);
 		kMeans2.cluster();
 		ArrayList<Integer> unRUL=kMeans2.getUnreliableUserList();
 //		kMeans2.printPoints();
 //		kMeans2.printClusters();
 //		kMeans2.printBelongs();
-		System.out.println(unRUL.toString());
+//		System.out.println(unRUL.toString());
 		
-		System.out.println();
-		System.out.println("sorted");
+//		System.out.println();
+//		System.out.println("sorted");
 		
-		indexSorted = tester.sortIndex(userCount);
-		for(int i=0; i<userNumber; i++){
-			System.out.println("No."+i+" index="+indexSorted[i]+" countNum="+userCount[i]+"\t");
+//		indexSorted = tester.sortIndex(userCount);
+//		for(int i=0; i<userNumber; i++){
+//			System.out.println("No."+i+" index="+indexSorted[i]+" countNum="+userCount[i]+"\t");
+//		}
+		
+		tester.writeUser("userClusted.txt");
+		tester.buildClustedUserList(userClustered, unRUL);
+		for(int i=0; i<clustedUserList.size(); i++){
+			clustedUserList.get(i).sortSimUser();
 		}
-			*/
+		tester.printclustedUserList();
 	}
 }

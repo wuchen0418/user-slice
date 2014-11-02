@@ -4,13 +4,15 @@ import java.util.ArrayList;
 public class ClustedUser 
 {
 	private int userNo;
-	private ArrayList <SimUser> simUserList;
+	private ArrayList <SimUser> simUserList = new ArrayList <SimUser>();
+	private int outlierFlag;
 	
 	public ClustedUser(User aUser, ArrayList<Integer> unreliableuser)
 	{
 		ArrayList <Integer> userlistInUserSet = new ArrayList<Integer>();
 		if(!unreliableuser.contains(aUser.getUserNo())){
 			this.userNo = aUser.getUserNo();
+			this.outlierFlag = 0;
 			this.simUserList = new ArrayList<SimUser>();
 			ArrayList<UserSet> userListCluseted = aUser.getClusters();
 			for(int i=0; i<userListCluseted.size(); i++){
@@ -19,6 +21,11 @@ public class ClustedUser
 				this.addSimUser(userlistInUserSet, unreliableuser);
 			}
 		}
+	}
+	
+	public ClustedUser(int outlierUserNo, int outlierflag){
+		this.userNo=outlierUserNo;
+		this.outlierFlag=1;
 	}
 
 	public int getUserNo()
@@ -43,17 +50,32 @@ public class ClustedUser
 			if(unreliableuser.contains(usernoInUserSet))
 				continue;
 			if(!simUserNo.contains(usernoInUserSet)){
-				this.simUserList.add(new SimUser(userNo));
+				this.simUserList.add(new SimUser(usernoInUserSet));
 			}
 			else{
 				for(int j=0; j<this.simUserList.size(); j++){
 					SimUser aSimUser = this.simUserList.get(j);
 					int index = aSimUser.getUserNo();
-					if(index==this.simUserList.get(j).getUserNo()){
+					if(index==usernoInUserSet){
 						this.simUserList.get(j).addCount();
 					}
 				}
 			}
 		}
 	}
+	public void sortSimUser(){
+		if(outlierFlag==0){
+			for(int i=0; i<this.simUserList.size(); i++){
+				for(int j=0; j<this.simUserList.size()-1; j++){
+					SimUser aSimUser1= this.simUserList.get(j);
+					SimUser aSimUser2= this.simUserList.get(j+1);
+					if(aSimUser1.getCount()<aSimUser2.getCount()){
+						this.simUserList.set(j, aSimUser2);
+						this.simUserList.set(j+1, aSimUser1);
+					}
+				}
+			}
+		}
+	}
+	
 }
