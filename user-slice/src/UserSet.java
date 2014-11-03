@@ -13,7 +13,11 @@ public class UserSet
 		this.clusterNo = clusterNo; 
 		this.user = new ArrayList<Integer>();
 	}
-		
+	
+	public int getClusterNo()
+	{
+		return this.clusterNo;
+	}	
 	public void addUser(Integer userNo)
 	{
 		user.add(userNo);
@@ -25,6 +29,7 @@ public class UserSet
 			user.add(userlist.get(i));
 		}
 	}
+	
 	
 	
 	public void removeUser(Integer userNo)

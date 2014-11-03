@@ -44,11 +44,23 @@ public class Prediction {
 		for(int i=0; i<userNumber; i++){
 			ClustedUser aClustedUser = clustedUserList.get(i);
 			for(int j=0; j<itemNumber; j++){
+				ArrayList<Integer> userNoInItem = new ArrayList<Integer>();
+				for(int index=0;index<userNumber;index++){
+					if(randomedMatrix[index][j]!=-1&&randomedMatrix[index][j]!=-2&&randomedMatrix[index][j]!=-3){
+						userNoInItem.add(index);
+					}
+				}
 				//no value in originalMatrix
 				if(randomedMatrix[i][j]==-1) 
 					predictedMatrix[i][j]=-1;
 				if(randomedMatrix[i][j]==-2){
-					ArrayList<SimUser> aSimUserList = aClustedUser.getSimUserList();
+					for(int u=0;u<clustedUserList.size();u++){
+						SimUser aSimUser = aClustedUser.getSimUser(u);
+						if(userNoInItem.contains(aSimUser.getUserNo())){
+							
+						}
+					}
+					
 				}
 				if(randomedMatrix[i][j]==-3){
 					//predictedMatrix[i][j] = UMean;

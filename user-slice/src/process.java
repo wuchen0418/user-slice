@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class process {
 
 	private static ArrayList<User> userClustered = new ArrayList<User>();
+	private static ArrayList<UserSetInItem> userSetInItems = new ArrayList<UserSetInItem>();
 	private static ArrayList<ClustedUser> clustedUserList = new ArrayList<ClustedUser>();
 	private int userNumber = 339;
 	private int itemNumber = 5825;
@@ -15,7 +16,6 @@ public class process {
 		String prefix = "WSDream-QoSDataset2/";
 		String matrix = "rtMatrix"; 
 //		int userNumber = 339; 
-//		int itemNumber = 5825;
 //		int itemNumber = 5825;
 		float[][] removedMatrix;
 		float[][] randomedMatrix;
@@ -62,6 +62,12 @@ public class process {
 	public void buildUser(int userNum){
 		for(int i=0; i<userNum; i++){
 			userClustered.add(i, new User(i));
+		}
+	}
+	
+	public void buildUserSetInItems(int itemNum){
+		for(int i=0; i<itemNum; i++){
+			userSetInItems.add(i, new UserSetInItem(i));
 		}
 	}
 	
@@ -146,6 +152,26 @@ public class process {
 		}
 	}
 	
+	public void printUserSetInItems(){
+		for(int i = 0;i < 1;i++)
+//		for(int i = 0;i < clustedUserList.size();i++)
+		{
+			UserSetInItem tempUserSetInItem = userSetInItems.get(i);
+			ArrayList<UserSet> tempUserSets = tempUserSetInItem.getUserSets();
+			if(tempUserSets.isEmpty()){
+				System.out.println("item "+ i +" is an outliser");
+			}
+			else{
+				System.out.println("item "+i+" has "+tempUserSets.size() +" simuers");
+
+			}
+			for(int s =0; s<tempUserSets.size(); s++){
+				UserSet aUserSet = tempUserSets.get(s);
+				System.out.println("UserSet:"+ aUserSet.getClusterNo()+ " has users:"+aUserSet.getUser());
+			}
+		}
+	}
+	
 	public static void main(String[] args) {
 		String matrix = "rtMatrix";
 		process tester= new process();
@@ -163,6 +189,7 @@ public class process {
 		
 		randomedMatrix = UtilityFunctions.readMatrix("randomed/" + matrix + density + "_" + random, userNumber, itemNumber);
 		tester.buildUser(userNumber);
+		tester.buildUserSetInItems(itemNumber);
 		
 		for(int itemNo=0; itemNo<itemNumber; itemNo++){			
 			ArrayList<UserSet> userSetsInOneItem = new ArrayList<UserSet>();
@@ -171,6 +198,7 @@ public class process {
 				KMeans kMeans = new KMeans(itemRtList);
 				kMeans.cluster();
 				userSetsInOneItem = kMeans.buildUserSet(itemNo);
+				userSetInItems.add(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
 				
 				for(int i=0; i<userSetsInOneItem.size(); i++){
 					UserSet aUserSet = userSetsInOneItem.get(i);
@@ -216,12 +244,12 @@ public class process {
 //		for(int i=0; i<userNumber; i++){
 //			System.out.println("No."+i+" index="+indexSorted[i]+" countNum="+userCount[i]+"\t");
 //		}
-		
-		tester.writeUser("userClusted.txt");
-		tester.buildClustedUserList(userClustered, unRUL);
-		for(int i=0; i<clustedUserList.size(); i++){
-			clustedUserList.get(i).sortSimUser();
-		}
-		tester.printclustedUserList();
+		tester.printUserSetInItems();
+//		tester.writeUser("userClusted.txt");
+//		tester.buildClustedUserList(userClustered, unRUL);
+//		for(int i=0; i<clustedUserList.size(); i++){
+//			clustedUserList.get(i).sortSimUser();
+//		}
+//		tester.printclustedUserList();
 	}
 }

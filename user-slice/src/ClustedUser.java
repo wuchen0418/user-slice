@@ -38,6 +38,10 @@ public class ClustedUser
 		return this.simUserList;
 	}
 	
+	public SimUser getSimUser(int i){
+		return this.simUserList.get(i);
+	}
+	
 	public void addSimUser(ArrayList<Integer> userlistInUserSet, ArrayList<Integer> unreliableuser){
 		ArrayList<Integer> simUserNo = new ArrayList<Integer>();
 		for(int i=0; i<this.simUserList.size();i++){
