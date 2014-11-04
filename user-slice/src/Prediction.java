@@ -58,7 +58,7 @@ public class Prediction {
 					continue;
 				}
 				if(randomedMatrix[i][j]==-2){
-					for(int u=0;u<clustedUserList.size();u++){
+					for(int u=0;u<aClustedUser.getSimUserList().size();u++){
 						SimUser aSimUser = aClustedUser.getSimUser(u);
 						if(userNoInItem.contains(aSimUser.getUserNo())){ //simuser invoke the item
 							simFlag=1;
@@ -91,6 +91,7 @@ public class Prediction {
 				}
 			}
 		}
+		UtilityFunctions.writeMatrix(predictedMatrix, "predicted/d"+density+"r"+"random.txt");
 	}
 	
 	public void removeOutlier(){

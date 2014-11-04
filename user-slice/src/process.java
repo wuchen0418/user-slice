@@ -11,6 +11,8 @@ public class process {
 	private static ArrayList<ClustedUser> clustedUserList = new ArrayList<ClustedUser>();
 	private int userNumber = 339;
 	private int itemNumber = 5825;
+
+	
 	
 	public void preProcess() {
 		String prefix = "WSDream-QoSDataset2/";
@@ -173,6 +175,7 @@ public class process {
 	}
 	
 	public static void main(String[] args) {
+		String prefix = "WSDream-QoSDataset2/";
 		String matrix = "rtMatrix";
 		process tester= new process();
 		tester.preProcess();
@@ -183,6 +186,9 @@ public class process {
 		ArrayList<Integer> unreliableUser = new ArrayList<Integer>();
 		int[] userCount=new int[userNumber];
 		int[] indexSorted = new int[itemNumber];
+		
+		
+
 				
 		float density = (float)0.1;
 		float random = (float)0.03;
@@ -240,16 +246,21 @@ public class process {
 //		System.out.println();
 //		System.out.println("sorted");
 		
-//		indexSorted = tester.sortIndex(userCount);
+		indexSorted = tester.sortIndex(userCount);
 //		for(int i=0; i<userNumber; i++){
 //			System.out.println("No."+i+" index="+indexSorted[i]+" countNum="+userCount[i]+"\t");
 //		}
 		tester.printUserSetInItems();
 //		tester.writeUser("userClusted.txt");
-//		tester.buildClustedUserList(userClustered, unRUL);
+		tester.buildClustedUserList(userClustered, unRUL);
 //		for(int i=0; i<clustedUserList.size(); i++){
 //			clustedUserList.get(i).sortSimUser();
 //		}
 //		tester.printclustedUserList();
+		
+		float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", userNumber, itemNumber);
+		
+		Prediction prediction = new Prediction();
+		prediction.cluserMean(originalMatrix, randomedMatrix, random, density, unRUL, clustedUserList, userSetInItems);
 	}
 }
