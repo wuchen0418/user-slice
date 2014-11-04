@@ -31,4 +31,16 @@ public class UserSetInItem
 	public void addCluster(UserSet aUserSet){
 		this.userSets.add(aUserSet);
 	}
+	
+	public UserSet getUserSet(int userNo){
+		UserSet aUserSet=null;
+		for(int i=0; i<userSets.size();i++){
+			aUserSet = userSets.get(i);
+			ArrayList<Integer> userNoList = aUserSet.getUser();
+			if(userNoList.contains(userNo)){
+				break;
+			}
+		}
+		return aUserSet; 
+	}
 }

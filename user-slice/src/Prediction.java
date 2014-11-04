@@ -38,32 +38,56 @@ public class Prediction {
 		}
 	}
 	public void cluserMean(float[][] originalMatrix, float[][] randomedMatrix, float random, 
-			float density,ArrayList<Integer> unreliableUserList, ArrayList<ClustedUser> clustedUserList){
+			float density,ArrayList<Integer> unreliableUserList, ArrayList<ClustedUser> clustedUserList, ArrayList<UserSetInItem> userSetInItems){
 		//outlier has been removed
 		float[][] predictedMatrix = new float[randomedMatrix.length][randomedMatrix[0].length];
 		for(int i=0; i<userNumber; i++){
 			ClustedUser aClustedUser = clustedUserList.get(i);
 			for(int j=0; j<itemNumber; j++){
-				ArrayList<Integer> userNoInItem = new ArrayList<Integer>();
+				ArrayList<Integer> userNoInItem = new ArrayList<Integer>(); //get the users who invoke the service
 				for(int index=0;index<userNumber;index++){
 					if(randomedMatrix[index][j]!=-1&&randomedMatrix[index][j]!=-2&&randomedMatrix[index][j]!=-3){
 						userNoInItem.add(index);
 					}
 				}
 				//no value in originalMatrix
-				if(randomedMatrix[i][j]==-1) 
+				UserSetInItem aUserSetInItem = userSetInItems.get(j);
+				int simFlag =0; //flag for simuser
+				if(randomedMatrix[i][j]==-1){
 					predictedMatrix[i][j]=-1;
+					continue;
+				}
 				if(randomedMatrix[i][j]==-2){
 					for(int u=0;u<clustedUserList.size();u++){
 						SimUser aSimUser = aClustedUser.getSimUser(u);
-						if(userNoInItem.contains(aSimUser.getUserNo())){
-							
+						if(userNoInItem.contains(aSimUser.getUserNo())){ //simuser invoke the item
+							simFlag=1;
+							UserSet simUserSet = aUserSetInItem.getUserSet(aSimUser.getUserNo());
+							ArrayList<Integer> simUserNo = simUserSet.getUser();
+							int clusterMean=0;
+							int count=0;
+							for(int a=0; a<simUserNo.size(); a++){
+								if(!unreliableUserList.contains(simUserNo.get(a))){
+									clusterMean += randomedMatrix[simUserNo.get(a)][j];
+									count++;
+								}
+							}
+							if(count!=0){
+								clusterMean=clusterMean/count; //get the cluster Mean of the SimUser
+							}
+							else{
+								clusterMean=0; // all simUsers are outliers
+							}
+						}
+						else{ //simuser dose not invoke the item
+							continue; 
 						}
 					}
-					
+					continue;
 				}
-				if(randomedMatrix[i][j]==-3){
+				if(randomedMatrix[i][j]==-3||simFlag==0){ //no simuser
 					//predictedMatrix[i][j] = UMean;
+					continue;
 				}
 			}
 		}
