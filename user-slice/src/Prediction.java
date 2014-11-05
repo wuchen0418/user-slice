@@ -18,15 +18,33 @@ public class Prediction {
 	private float[][] originalMatrix;
 	private float[][] randomedMatrix;
 	private float[][] predictedMatrix;
-	private int userNumber = 339;
-	private int itemNumber = 5825;
+	private float random;
+	private float density;
+	private int userNumber;
+	private int itemNumber;
 	
-	public void predictorOnCluster(float[][] originalMatrix, float[][] randomedMatrix, float random, float density,ArrayList<Integer> unreliableUserList, ArrayList<User> userClustered){
+	private ArrayList<SimUserSet> simUserSetList;
+	private ArrayList<UserSetInItem> userSetInItemList;
+	
+	public Prediction(float[][] originalMatrix, float[][] randomedMatrix, float random, 
+			float density,int userNum, int itemNum, ArrayList<Integer> unreliableUserList, ArrayList<SimUserSet> simUserSetList, ArrayList<UserSetInItem> userSetInItemList){
+		this.originalMatrix=originalMatrix;
+		this.randomedMatrix=randomedMatrix;
+		this.random=random;
+		this.density=density;
+		this.unreliableUserList=unreliableUserList;
+		this.userNumber=userNum;
+		this.itemNumber=itemNum;
+		this.simUserSetList=simUserSetList;
+		this.userSetInItemList=userSetInItemList;		
+	}
+	
+	public void predictorOnCluster(float[][] originalMatrix, float[][] randomedMatrix, float random, float density,ArrayList<Integer> unreliableUserList, ArrayList<UserSetInUser> userClustered){
 		ArrayList<Integer> clustedUser = new ArrayList<Integer>();
 		float[][] predictedMatrix = new float[randomedMatrix.length][randomedMatrix[0].length];
 
 		for(int i=0; i<randomedMatrix.length; i++){
-			User aUser = userClustered.get(i);
+			UserSetInUser aUser = userClustered.get(i);
 			if(aUser.getUserNo()!=i)
 				continue;
 			for(int j=0; j<randomedMatrix[0].length; j++){
@@ -37,12 +55,15 @@ public class Prediction {
 			}
 		}
 	}
-	public void cluserMean(float[][] originalMatrix, float[][] randomedMatrix, float random, 
-			float density,ArrayList<Integer> unreliableUserList, ArrayList<ClustedUser> clustedUserList, ArrayList<UserSetInItem> userSetInItems){
+//	public void cluserMean(float[][] originalMatrix, float[][] randomedMatrix, float random, 
+//			float density,ArrayList<Integer> unreliableUserList, ArrayList<SimUserSet> clustedUserList, ArrayList<UserSetInItem> userSetInItems){
+//		
+	public void cluserMean(){
 		//outlier has been removed
+		removeOutlier();
 		float[][] predictedMatrix = new float[randomedMatrix.length][randomedMatrix[0].length];
 		for(int i=0; i<userNumber; i++){
-			ClustedUser aClustedUser = clustedUserList.get(i);
+			SimUserSet aSimUserSet = simUserSetList.get(i);
 			for(int j=0; j<itemNumber; j++){
 				ArrayList<Integer> userNoInItem = new ArrayList<Integer>(); //get the users who invoke the service
 				for(int index=0;index<userNumber;index++){
@@ -50,20 +71,21 @@ public class Prediction {
 						userNoInItem.add(index);
 					}
 				}
-				//no value in originalMatrix
-				UserSetInItem aUserSetInItem = userSetInItems.get(j);
+				
+				UserSetInItem aUserSetInItem = userSetInItemList.get(j);
 				int simFlag =0; //flag for simuser
-				if(randomedMatrix[i][j]==-1){
+				if(randomedMatrix[i][j]==-1){  //no value in originalMatrix
 					predictedMatrix[i][j]=-1;
 					continue;
 				}
 				if(randomedMatrix[i][j]==-2){
-					for(int u=0;u<aClustedUser.getSimUserList().size();u++){
-						SimUser aSimUser = aClustedUser.getSimUser(u);
+					for(int u=0;u<aSimUserSet.getSimUserList().size();u++){
+						SimUser aSimUser = aSimUserSet.getSimUser(u);
 						if(userNoInItem.contains(aSimUser.getUserNo())){ //simuser invoke the item
 							simFlag=1;
 							UserSet simUserSet = aUserSetInItem.getUserSet(aSimUser.getUserNo());
-							ArrayList<Integer> simUserNo = simUserSet.getUser();
+							System.out.println("i="+i+",j="+j+";u="+u);
+							ArrayList<Integer> simUserNo = simUserSet.getUserNoList();
 							int clusterMean=0;
 							int count=0;
 							for(int a=0; a<simUserNo.size(); a++){

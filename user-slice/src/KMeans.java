@@ -13,7 +13,7 @@ public class KMeans
 	private static double lastE = Double.MAX_VALUE;
 	private static double curE = 0.0;
 	private ArrayList<Integer> user = new ArrayList<Integer>() ;
-	private ArrayList<User> userClustered = new ArrayList<User>();
+	private ArrayList<UserSetInUser> userClustered = new ArrayList<UserSetInUser>();
 	
 	public Boolean userGreaterK(float[] URR){
 		int count = 0;
@@ -208,7 +208,7 @@ public class KMeans
 	
 	public void buildUser(int userNum){
 		for(int i=0; i<userNum; i++){
-			userClustered.add(i, new User(i));
+			userClustered.add(i, new UserSetInUser(i));
 		}
 	}
 	

@@ -30,7 +30,7 @@ public class Predictor {
 	Vector<String> country = new Vector<String>();
 	
 	
-	public void predictorOnCluster(float[][] originalMatrix, float[][] randomedMatrix, float random, float density,ArrayList<Integer> unreliableUserList, ArrayList<User> userClustered){
+	public void predictorOnCluster(float[][] originalMatrix, float[][] randomedMatrix, float random, float density,ArrayList<Integer> unreliableUserList, ArrayList<UserSetInUser> userClustered){
 		ArrayList<Integer> clustedUser = new ArrayList<Integer>();
 //		float[][] originalMatrixT = UtilityFunctions.matrixTransfer(originalMatrix);
 //		float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
@@ -46,7 +46,7 @@ public class Predictor {
 		}
 		
 		for(int i=0; i<randomedMatrix.length; i++){
-			User aUser = userClustered.get(i);
+			UserSetInUser aUser = userClustered.get(i);
 			if(aUser.getUserNo()!=i)
 				continue;
 			for(int j=0; j<randomedMatrix[0].length; j++){
