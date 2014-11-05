@@ -34,6 +34,7 @@ public class UserSetInItem
 	
 	public UserSet getUserSet(int userNo){
 		UserSet aUserSet=null;
+		System.out.println("userSetInItemList size:"+userSetInItemList.size()); 
 		for(int i=0; i<userSetInItemList.size();i++){
 			aUserSet = userSetInItemList.get(i);
 			ArrayList<Integer> userNoList = aUserSet.getUserNoList();

@@ -86,7 +86,7 @@ public class Prediction {
 							UserSet simUserSet = aUserSetInItem.getUserSet(aSimUser.getUserNo());
 							System.out.println("i="+i+",j="+j+";u="+u);
 							ArrayList<Integer> simUserNo = simUserSet.getUserNoList();
-							int clusterMean=0;
+							float clusterMean=0;
 							int count=0;
 							for(int a=0; a<simUserNo.size(); a++){
 								if(!unreliableUserList.contains(simUserNo.get(a))){
@@ -100,6 +100,8 @@ public class Prediction {
 							else{
 								clusterMean=0; // all simUsers are outliers
 							}
+							predictedMatrix[i][j] = clusterMean;
+							break;
 						}
 						else{ //simuser dose not invoke the item
 							continue; 
@@ -108,7 +110,7 @@ public class Prediction {
 					continue;
 				}
 				if(randomedMatrix[i][j]==-3||simFlag==0){ //no simuser
-					//predictedMatrix[i][j] = UMean;
+					predictedMatrix[i][j] = 0;
 					continue;
 				}
 			}

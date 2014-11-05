@@ -23,7 +23,7 @@ public class KMeans
 				count++;
 			}
 		}
-		if(count>=7){
+		if(count>=K){
 			return true;
 		}
 		else 
