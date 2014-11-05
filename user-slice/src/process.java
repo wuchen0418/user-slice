@@ -6,14 +6,12 @@ import java.util.ArrayList;
 
 public class process {
 
-	private static ArrayList<User> userClustered = new ArrayList<User>();
-	private static ArrayList<UserSetInItem> userSetInItems = new ArrayList<UserSetInItem>();
-	private static ArrayList<ClustedUser> clustedUserList = new ArrayList<ClustedUser>();
+	private static ArrayList<UserSetInUser> userSetInUserList = new ArrayList<UserSetInUser>();
+	private static ArrayList<UserSetInItem> userSetInItemList = new ArrayList<UserSetInItem>();
+	private static ArrayList<SimUserSet> simUserSetList = new ArrayList<SimUserSet>();
 	private int userNumber = 339;
 	private int itemNumber = 5825;
 
-	
-	
 	public void preProcess() {
 		String prefix = "WSDream-QoSDataset2/";
 		String matrix = "rtMatrix"; 
@@ -61,23 +59,23 @@ public class process {
 		return indexSorted;
 	}
 	
-	public void buildUser(int userNum){
+	public void buildUserSetInUserList(int userNum){
 		for(int i=0; i<userNum; i++){
-			userClustered.add(i, new User(i));
+			userSetInUserList.add(i, new UserSetInUser(i));
 		}
 	}
 	
-	public void buildUserSetInItems(int itemNum){
+	public void buildUserSetInItemList(int itemNum){
 		for(int i=0; i<itemNum; i++){
-			userSetInItems.add(i, new UserSetInItem(i));
+			userSetInItemList.add(i, new UserSetInItem(i));
 		}
 	}
 	
 	public void printUserClustered(){
 		for(int i = 0;i < this.userNumber;i++)
 		{
-			User temUser = userClustered.get(i);
-			ArrayList<UserSet> tempUserSet = temUser.getClusters();
+			UserSetInUser temUser = userSetInUserList.get(i);
+			ArrayList<UserSet> tempUserSet = temUser.getUserSetInUserList();
 			System.out.println("user "+ i +"has "+tempUserSet.size() +" userSets:"+tempUserSet.toString());
 		}
 	}
@@ -90,8 +88,8 @@ public class process {
             
     		for(int i = 0;i < this.userNumber;i++)
     		{
-    			User temUser = userClustered.get(i);
-    			ArrayList<UserSet> tempUserSet = temUser.getClusters();
+    			UserSetInUser temUser = userSetInUserList.get(i);
+    			ArrayList<UserSet> tempUserSet = temUser.getUserSetInUserList();
     			line += "user "+ i +" has "+tempUserSet.size() +" userSets:"+tempUserSet.toString();
     			writer.write(line);
     			writer.newLine();
@@ -119,26 +117,26 @@ public class process {
 			return false;
 	}
 	
-	public void buildClustedUserList (ArrayList<User> userList, ArrayList<Integer> unreliablelist){
+	public void bulidSimUserSet (ArrayList<UserSetInUser> userList, ArrayList<Integer> unreliablelist){
 		for(int i=0; i<this.userNumber; i++){
-			User aUser = userList.get(i);
-			ClustedUser newClustedUser;
+			UserSetInUser aUser = userList.get(i);
+			SimUserSet newClustedUser;
 			//for outlier
 			if(unreliablelist.contains(aUser.getUserNo())){
-				newClustedUser = new ClustedUser(aUser.getUserNo(),1);
+				newClustedUser = new SimUserSet(aUser.getUserNo(),1);
 			}
 			else{
-				newClustedUser = new ClustedUser(aUser,unreliablelist);
+				newClustedUser = new SimUserSet(aUser,unreliablelist);
 			}
-			clustedUserList.add(newClustedUser);
+			simUserSetList.add(newClustedUser);
 		}
 	}
 	
 	public void printclustedUserList(){
 		for(int i = 0;i < 1;i++)
-//		for(int i = 0;i < clustedUserList.size();i++)
+//		for(int i = 0;i < simUserSetList.size();i++)
 		{
-			ClustedUser tempUser = clustedUserList.get(i);
+			SimUserSet tempUser = simUserSetList.get(i);
 			ArrayList<SimUser> tempSimUserlist = tempUser.getSimUserList();
 			if(tempSimUserlist.isEmpty()){
 				System.out.println("user "+ tempUser.getUserNo() +" is an outliser");
@@ -156,9 +154,9 @@ public class process {
 	
 	public void printUserSetInItems(){
 		for(int i = 0;i < 1;i++)
-//		for(int i = 0;i < clustedUserList.size();i++)
+//		for(int i = 0;i < simUserSetList.size();i++)
 		{
-			UserSetInItem tempUserSetInItem = userSetInItems.get(i);
+			UserSetInItem tempUserSetInItem = userSetInItemList.get(i);
 			ArrayList<UserSet> tempUserSets = tempUserSetInItem.getUserSets();
 			if(tempUserSets.isEmpty()){
 				System.out.println("item "+ i +" is an outliser");
@@ -169,7 +167,7 @@ public class process {
 			}
 			for(int s =0; s<tempUserSets.size(); s++){
 				UserSet aUserSet = tempUserSets.get(s);
-				System.out.println("UserSet:"+ aUserSet.getClusterNo()+ " has users:"+aUserSet.getUser());
+				System.out.println("UserSet:"+ aUserSet.getClusterNo()+ " has users:"+aUserSet.getUserNoList());
 			}
 		}
 	}
@@ -194,8 +192,8 @@ public class process {
 		float random = (float)0.03;
 		
 		randomedMatrix = UtilityFunctions.readMatrix("randomed/" + matrix + density + "_" + random, userNumber, itemNumber);
-		tester.buildUser(userNumber);
-		tester.buildUserSetInItems(itemNumber);
+		tester.buildUserSetInUserList(userNumber);
+		tester.buildUserSetInItemList(itemNumber);
 		
 		for(int itemNo=0; itemNo<itemNumber; itemNo++){			
 			ArrayList<UserSet> userSetsInOneItem = new ArrayList<UserSet>();
@@ -204,17 +202,17 @@ public class process {
 				KMeans kMeans = new KMeans(itemRtList);
 				kMeans.cluster();
 				userSetsInOneItem = kMeans.buildUserSet(itemNo);
-				userSetInItems.add(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
+				userSetInItemList.add(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
 				
 				for(int i=0; i<userSetsInOneItem.size(); i++){
 					UserSet aUserSet = userSetsInOneItem.get(i);
 					ArrayList<Integer> usersInUserSet = new ArrayList<Integer>(); //store the userno in userSet
-					usersInUserSet = aUserSet.getUser();
+					usersInUserSet = aUserSet.getUserNoList();
 					for(int u=0; u<usersInUserSet.size(); u++){
 						int userno = usersInUserSet.get(u);
-						User temUser = userClustered.get(userno);
-						temUser.addCluster(aUserSet);
-						userClustered.set(userno, temUser);
+						UserSetInUser temUser = userSetInUserList.get(userno);
+						temUser.addUserSetInUserList(aUserSet);
+						userSetInUserList.set(userno, temUser);
 					}
 				}
 //				kMeans.printPoints();
@@ -252,15 +250,15 @@ public class process {
 //		}
 		tester.printUserSetInItems();
 //		tester.writeUser("userClusted.txt");
-		tester.buildClustedUserList(userClustered, unRUL);
-//		for(int i=0; i<clustedUserList.size(); i++){
-//			clustedUserList.get(i).sortSimUser();
+		tester.bulidSimUserSet(userSetInUserList, unRUL);
+//		for(int i=0; i<simUserSetList.size(); i++){
+//			simUserSetList.get(i).sortSimUser();
 //		}
 //		tester.printclustedUserList();
 		
 		float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", userNumber, itemNumber);
 		
-		Prediction prediction = new Prediction();
-		prediction.cluserMean(originalMatrix, randomedMatrix, random, density, unRUL, clustedUserList, userSetInItems);
+		Prediction prediction = new Prediction(originalMatrix, randomedMatrix, random, density, userNumber, itemNumber, unRUL, simUserSetList, userSetInItemList);
+		prediction.cluserMean();
 	}
 }

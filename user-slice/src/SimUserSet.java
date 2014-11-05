@@ -1,29 +1,29 @@
 import java.util.ArrayList;
 
 
-public class ClustedUser 
+public class SimUserSet 
 {
 	private int userNo;
 	private ArrayList <SimUser> simUserList = new ArrayList <SimUser>();
 	private int outlierFlag;
 	
-	public ClustedUser(User aUser, ArrayList<Integer> unreliableuser)
+	public SimUserSet(UserSetInUser aUser, ArrayList<Integer> unreliableuser)
 	{
 		ArrayList <Integer> userlistInUserSet = new ArrayList<Integer>();
 		if(!unreliableuser.contains(aUser.getUserNo())){
 			this.userNo = aUser.getUserNo();
 			this.outlierFlag = 0;
 			this.simUserList = new ArrayList<SimUser>();
-			ArrayList<UserSet> userListCluseted = aUser.getClusters();
+			ArrayList<UserSet> userListCluseted = aUser.getUserSetInUserList();
 			for(int i=0; i<userListCluseted.size(); i++){
 				UserSet aUserSet = userListCluseted.get(i);
-				userlistInUserSet = aUserSet.getUser();
+				userlistInUserSet = aUserSet.getUserNoList();
 				this.addSimUser(userlistInUserSet, unreliableuser);
 			}
 		}
 	}
 	
-	public ClustedUser(int outlierUserNo, int outlierflag){
+	public SimUserSet(int outlierUserNo, int outlierflag){
 		this.userNo=outlierUserNo;
 		this.outlierFlag=1;
 	}

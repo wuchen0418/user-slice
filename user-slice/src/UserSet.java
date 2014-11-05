@@ -5,13 +5,13 @@ public class UserSet
 {
 	private int itemNo;
 	private int clusterNo;
-	private ArrayList<Integer> user;
+	private ArrayList<Integer> userNoList;
 	
 	public UserSet(int itemNo, int clusterNo)
 	{
 		this.itemNo = itemNo;
 		this.clusterNo = clusterNo; 
-		this.user = new ArrayList<Integer>();
+		this.userNoList = new ArrayList<Integer>();
 	}
 	
 	public int getClusterNo()
@@ -20,13 +20,13 @@ public class UserSet
 	}	
 	public void addUser(Integer userNo)
 	{
-		user.add(userNo);
+		userNoList.add(userNo);
 	}
 	
 	public void addUser(ArrayList<Integer> userlist)
 	{
 		for(int i=0; i<userlist.size(); i++){
-			user.add(userlist.get(i));
+			userNoList.add(userlist.get(i));
 		}
 	}
 	
@@ -34,28 +34,28 @@ public class UserSet
 	
 	public void removeUser(Integer userNo)
 	{
-		user.remove(userNo);
+		userNoList.remove(userNo);
 	}
 	
 	public void printElements()
 	{
-		for(int i = 0;i < user.size();i++)
+		for(int i = 0;i < userNoList.size();i++)
 		{
-			System.out.print(user.get(i).toString()+",");
+			System.out.print(userNoList.get(i).toString()+",");
 		}
 		System.out.println();
 	}
 	
-	public int getClusterSize(){
-		return user.size();
+	public int getUserNoListSize(){
+		return userNoList.size();
 	}
 	
-	public ArrayList<Integer> getUser(){
-		return this.user;
+	public ArrayList<Integer> getUserNoList(){
+		return this.userNoList;
 	}
 	
 	public String toString()
 	{
-		return "clusters " + itemNo+","+clusterNo + " has " + user.size() + " element(s).";
+		return "clusters " + itemNo+","+clusterNo + " has " + userNoList.size() + " element(s).";
 	}
 }
