@@ -1,3 +1,4 @@
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,7 +62,11 @@ public class Prediction {
 	public void cluserMean(){
 		//outlier has been removed
 		removeOutlier();
+		System.out.println("Caculating begin: " + new Time(System.currentTimeMillis()));
+		
 		float[][] predictedMatrix = new float[randomedMatrix.length][randomedMatrix[0].length];
+		
+		
 		for(int i=0; i<userNumber; i++){
 			SimUserSet aSimUserSet = simUserSetList.get(i);
 			for(int j=0; j<itemNumber; j++){
@@ -71,7 +76,6 @@ public class Prediction {
 						userNoInItem.add(index);
 					}
 				}
-				
 				UserSetInItem aUserSetInItem = userSetInItemList.get(j);
 				int simFlag =0; //flag for simuser
 				if(randomedMatrix[i][j]==-1){  //no value in originalMatrix
@@ -84,7 +88,6 @@ public class Prediction {
 						if(userNoInItem.contains(aSimUser.getUserNo())){ //simuser invoke the item
 							simFlag=1;
 							UserSet simUserSet = aUserSetInItem.getUserSet(aSimUser.getUserNo());
-							System.out.println("i="+i+",j="+j+";u="+u);
 							ArrayList<Integer> simUserNo = simUserSet.getUserNoList();
 							float clusterMean=0;
 							int count=0;
@@ -110,11 +113,13 @@ public class Prediction {
 					continue;
 				}
 				if(randomedMatrix[i][j]==-3||simFlag==0){ //no simuser
-					predictedMatrix[i][j] = 0;
+					predictedMatrix[i][j] = -3;
 					continue;
 				}
 			}
 		}
+		System.out.println("Caculating end: " + new Time(System.currentTimeMillis()));
+		System.out.println("MAE=" + MAE(predictedMatrix));
 		UtilityFunctions.writeMatrix(predictedMatrix, "predicted/d"+density+"r"+"random.txt");
 	}
 	
@@ -127,6 +132,20 @@ public class Prediction {
 				randomedMatrix[userno][j]=-3; // outlier
 			}
 		}
+	}
+	
+	public double MAE(float[][] predictedMatrix){
+		double allMAE = 0;
+		double number = 0;
+		for (int i = 0; i < originalMatrix.length; i++) {
+			for (int j = 0; j < originalMatrix[0].length; j++) {
+				if(randomedMatrix[i][j] == -2 && originalMatrix[i][j] != -1 && predictedMatrix[i][j] != -3) {
+					allMAE += Math.abs(predictedMatrix[i][j] - originalMatrix[i][j]);
+					number ++;
+				}
+			}
+		}
+		return allMAE/number;
 	}
 
 

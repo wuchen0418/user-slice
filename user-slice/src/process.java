@@ -202,6 +202,9 @@ public class process {
 				KMeans kMeans = new KMeans(itemRtList);
 				kMeans.cluster();
 				userSetsInOneItem = kMeans.buildUserSet(itemNo);
+				if(userSetsInOneItem.size()!=7){
+					System.out.println("userSetsInOneItem size: item"+itemNo+":"+userSetsInOneItem.size());
+				}
 				userSetInItemList.add(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
 				
 				for(int i=0; i<userSetsInOneItem.size(); i++){
@@ -230,6 +233,18 @@ public class process {
 //					}
 				}
 	
+			}
+			else{
+				for(int t=0; t<itemRtList.length; t++){
+					float x = itemRtList[t];
+					int c=0;
+					if(x!=-2&&x!=-1){
+						UserSet aUserSet = new UserSet(itemNo,c);
+						userSetsInOneItem.add(aUserSet);
+						c++;
+					}
+				}
+				userSetInItemList.add(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
 			}
 		}
 
