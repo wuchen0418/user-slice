@@ -78,7 +78,7 @@ public class Prediction {
 				}
 				UserSetInItem aUserSetInItem = userSetInItemList.get(j);
 				int simFlag =0; //flag for simuser
-				if(randomedMatrix[i][j]==-1){  //no value in originalMatrix
+				if(originalMatrix[i][j]==-1){  //no value in originalMatrix
 					predictedMatrix[i][j]=-1;
 					continue;
 				}
@@ -87,8 +87,8 @@ public class Prediction {
 						SimUser aSimUser = aSimUserSet.getSimUser(u);
 						if(userNoInItem.contains(aSimUser.getUserNo())){ //simuser invoke the item
 							simFlag=1;
-							UserSet simUserSet = aUserSetInItem.getUserSet(aSimUser.getUserNo());
-							ArrayList<Integer> simUserNo = simUserSet.getUserNoList();
+							UserSet aUserSet = aUserSetInItem.getUserSet(aSimUser.getUserNo());
+							ArrayList<Integer> simUserNo = aUserSet.getUserNoList();
 							float clusterMean=0;
 							int count=0;
 							for(int a=0; a<simUserNo.size(); a++){
@@ -112,15 +112,18 @@ public class Prediction {
 					}
 					continue;
 				}
-				if(randomedMatrix[i][j]==-3||simFlag==0){ //no simuser
+				if(randomedMatrix[i][j]==-3){ //outlier
 					predictedMatrix[i][j] = -3;
 					continue;
+				}
+				else{
+					predictedMatrix[i][j]=randomedMatrix[i][j];
 				}
 			}
 		}
 		System.out.println("Caculating end: " + new Time(System.currentTimeMillis()));
 		System.out.println("MAE=" + MAE(predictedMatrix));
-		UtilityFunctions.writeMatrix(predictedMatrix, "predicted/d"+density+"r"+"random.txt");
+		UtilityFunctions.writeMatrix(predictedMatrix, "predicted/d"+density+"r"+random+"random.txt");
 	}
 	
 	public void removeOutlier(){

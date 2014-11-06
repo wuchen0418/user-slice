@@ -202,10 +202,7 @@ public class process {
 				KMeans kMeans = new KMeans(itemRtList);
 				kMeans.cluster();
 				userSetsInOneItem = kMeans.buildUserSet(itemNo);
-				if(userSetsInOneItem.size()!=7){
-					System.out.println("userSetsInOneItem size: item"+itemNo+":"+userSetsInOneItem.size());
-				}
-				userSetInItemList.add(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
+				userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
 				
 				for(int i=0; i<userSetsInOneItem.size(); i++){
 					UserSet aUserSet = userSetsInOneItem.get(i);
@@ -242,9 +239,14 @@ public class process {
 						UserSet aUserSet = new UserSet(itemNo,c);
 						userSetsInOneItem.add(aUserSet);
 						c++;
+						
+						UserSetInUser temUser = userSetInUserList.get(t);
+						temUser.addUserSetInUserList(aUserSet);
+						userSetInUserList.set(t, temUser);
+						
 					}
 				}
-				userSetInItemList.add(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
+				userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
 			}
 		}
 
@@ -266,9 +268,9 @@ public class process {
 		tester.printUserSetInItems();
 //		tester.writeUser("userClusted.txt");
 		tester.bulidSimUserSet(userSetInUserList, unRUL);
-//		for(int i=0; i<simUserSetList.size(); i++){
-//			simUserSetList.get(i).sortSimUser();
-//		}
+		for(int i=0; i<simUserSetList.size(); i++){
+			simUserSetList.get(i).sortSimUser();
+		}
 //		tester.printclustedUserList();
 		
 		float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", userNumber, itemNumber);
