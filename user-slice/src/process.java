@@ -246,6 +246,9 @@ public class process {
 						
 					}
 				}
+				if(userSetsInOneItem.size()==0){
+					System.out.println("userSetsInOneItem.size()==0");
+				}
 				userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
 			}
 		}
