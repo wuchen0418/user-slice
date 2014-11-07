@@ -113,8 +113,11 @@ public class process {
 		if(count>=7){
 			return true;
 		}
-		else 
+		else{
+			System.out.println("count = "+count);
 			return false;
+		}
+			
 	}
 	
 	public void bulidSimUserSet (ArrayList<UserSetInUser> userList, ArrayList<Integer> unreliablelist){

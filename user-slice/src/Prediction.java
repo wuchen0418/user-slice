@@ -76,29 +76,35 @@ public class Prediction {
 						userNoInItem.add(index);
 					}
 				}
-				UserSetInItem aUserSetInItem = userSetInItemList.get(j);
+				UserSetInItem aUserSetInItem = userSetInItemList.get(j); //get userSets in item j 
 				int simFlag =0; //flag for simuser
 				if(originalMatrix[i][j]==-1){  //no value in originalMatrix
 					predictedMatrix[i][j]=-1;
 					continue;
 				}
-				if(randomedMatrix[i][j]==-2){
+			
+				else if(randomedMatrix[i][j]==-3){ //outlier
+					predictedMatrix[i][j] = -3;
+					continue;
+				}
+				
+				else if(randomedMatrix[i][j]==-2){
 					for(int u=0;u<aSimUserSet.getSimUserList().size();u++){
 						SimUser aSimUser = aSimUserSet.getSimUser(u);
 						if(userNoInItem.contains(aSimUser.getUserNo())){ //simuser invoke the item
 							simFlag=1;
 							UserSet aUserSet = aUserSetInItem.getUserSet(aSimUser.getUserNo());
-							ArrayList<Integer> simUserNo = aUserSet.getUserNoList();
+							ArrayList<Integer> clustedUserNoList = aUserSet.getUserNoList();
 							float clusterMean=0;
 							int count=0;
-							for(int a=0; a<simUserNo.size(); a++){
-								if(!unreliableUserList.contains(simUserNo.get(a))){
-									clusterMean += randomedMatrix[simUserNo.get(a)][j];
+							for(int a=0; a<clustedUserNoList.size(); a++){
+								if(!unreliableUserList.contains(clustedUserNoList.get(a))){
+									clusterMean += randomedMatrix[clustedUserNoList.get(a)][j];
 									count++;
 								}
 							}
 							if(count!=0){
-								clusterMean=clusterMean/count; //get the cluster Mean of the SimUser
+								clusterMean=clusterMean/count; //get the cluster Mean of the cluster
 							}
 							else{
 								clusterMean=0; // all simUsers are outliers
@@ -110,10 +116,6 @@ public class Prediction {
 							continue; 
 						}
 					}
-					continue;
-				}
-				if(randomedMatrix[i][j]==-3){ //outlier
-					predictedMatrix[i][j] = -3;
 					continue;
 				}
 				else{
@@ -131,9 +133,10 @@ public class Prediction {
 		for(int i=0; i<unreliableUserList.size(); i++){
 			int userno=unreliableUserList.get(i);
 			for(int j=0; j<randomedMatrix[userno].length;j++)
-			if(randomedMatrix[userno][j]!=-1&&randomedMatrix[userno][j]!=-2){
-				randomedMatrix[userno][j]=-3; // outlier
-			}
+//			if(randomedMatrix[userno][j]!=-1&&randomedMatrix[userno][j]!=-2){
+//				
+//			}
+			randomedMatrix[userno][j]=-3; // outlier
 		}
 	}
 	
