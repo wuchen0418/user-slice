@@ -105,7 +105,7 @@ public class process {
 				count++;
 			}
 		}
-		if(count>=8){
+		if(count>=7){
 			return true;
 		}
 		else{
