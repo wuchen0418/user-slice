@@ -5,27 +5,22 @@ public class SimUserSet
 {
 	private int userNo;
 	private ArrayList <SimUser> simUserList = new ArrayList <SimUser>();
-	private int outlierFlag;
 	
-	public SimUserSet(UserSetInUser aUser, ArrayList<Integer> unreliableuser)
+	public SimUserSet(UserSetInUser aUser)
 	{
 		ArrayList <Integer> userlistInUserSet = new ArrayList<Integer>();
-		if(!unreliableuser.contains(aUser.getUserNo())){
-			this.userNo = aUser.getUserNo();
-			this.outlierFlag = 0;
-			this.simUserList = new ArrayList<SimUser>();
-			ArrayList<UserSet> userListCluseted = aUser.getUserSetInUserList();
-			for(int i=0; i<userListCluseted.size(); i++){
-				UserSet aUserSet = userListCluseted.get(i);
-				userlistInUserSet = aUserSet.getUserNoList();
-				this.addSimUser(userlistInUserSet, unreliableuser);
-			}
+		this.userNo = aUser.getUserNo();
+		this.simUserList = new ArrayList<SimUser>();
+		ArrayList<UserSet> userListCluseted = aUser.getUserSetInUserList();
+		for(int i=0; i<userListCluseted.size(); i++){
+			UserSet aUserSet = userListCluseted.get(i);
+			userlistInUserSet = aUserSet.getUserNoList();
+			this.addSimUser(userlistInUserSet);
 		}
 	}
 	
-	public SimUserSet(int outlierUserNo, int outlierflag){
+	public SimUserSet(int outlierUserNo){
 		this.userNo=outlierUserNo;
-		this.outlierFlag=1;
 	}
 
 	public int getUserNo()
@@ -42,7 +37,7 @@ public class SimUserSet
 		return this.simUserList.get(i);
 	}
 	
-	public void addSimUser(ArrayList<Integer> userlistInUserSet, ArrayList<Integer> unreliableuser){
+	public void addSimUser(ArrayList<Integer> userlistInUserSet){
 		ArrayList<Integer> simUserNo = new ArrayList<Integer>();
 		for(int i=0; i<this.simUserList.size();i++){
 			simUserNo.add(this.simUserList.get(i).getUserNo());
@@ -50,8 +45,6 @@ public class SimUserSet
 		for(int i=0; i<userlistInUserSet.size();i++){
 			int usernoInUserSet = userlistInUserSet.get(i);
 			if(this.userNo==usernoInUserSet)
-				continue;
-			if(unreliableuser.contains(usernoInUserSet))
 				continue;
 			if(!simUserNo.contains(usernoInUserSet)){
 				this.simUserList.add(new SimUser(usernoInUserSet));
@@ -68,15 +61,13 @@ public class SimUserSet
 		}
 	}
 	public void sortSimUser(){
-		if(outlierFlag==0){
-			for(int i=0; i<this.simUserList.size(); i++){
-				for(int j=0; j<this.simUserList.size()-1; j++){
-					SimUser aSimUser1= this.simUserList.get(j);
-					SimUser aSimUser2= this.simUserList.get(j+1);
-					if(aSimUser1.getCount()<aSimUser2.getCount()){
-						this.simUserList.set(j, aSimUser2);
-						this.simUserList.set(j+1, aSimUser1);
-					}
+		for(int i=0; i<this.simUserList.size(); i++){
+			for(int j=0; j<this.simUserList.size()-1; j++){
+				SimUser aSimUser1= this.simUserList.get(j);
+				SimUser aSimUser2= this.simUserList.get(j+1);
+				if(aSimUser1.getCount()<aSimUser2.getCount()){
+					this.simUserList.set(j, aSimUser2);
+					this.simUserList.set(j+1, aSimUser1);
 				}
 			}
 		}

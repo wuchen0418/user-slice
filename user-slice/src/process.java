@@ -15,8 +15,6 @@ public class process {
 	public void preProcess() {
 		String prefix = "WSDream-QoSDataset2/";
 		String matrix = "rtMatrix"; 
-//		int userNumber = 339; 
-//		int itemNumber = 5825;
 		float[][] removedMatrix;
 		
 		float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", this.userNumber, this.itemNumber);
@@ -107,7 +105,7 @@ public class process {
 				count++;
 			}
 		}
-		if(count>=7){
+		if(count>=8){
 			return true;
 		}
 		else{
@@ -117,17 +115,11 @@ public class process {
 			
 	}
 	
-	public void bulidSimUserSet (ArrayList<UserSetInUser> userList, ArrayList<Integer> unreliablelist){
+	public void bulidSimUserSet (ArrayList<UserSetInUser> userList){
 		for(int i=0; i<this.userNumber; i++){
 			UserSetInUser aUser = userList.get(i);
 			SimUserSet newClustedUser;
-			//for outlier
-			if(unreliablelist.contains(aUser.getUserNo())){
-				newClustedUser = new SimUserSet(aUser.getUserNo(),1);
-			}
-			else{
-				newClustedUser = new SimUserSet(aUser,unreliablelist);
-			}
+			newClustedUser = new SimUserSet(aUser);
 			simUserSetList.add(newClustedUser);
 		}
 	}
@@ -179,7 +171,7 @@ public class process {
 		tester.preProcess();
 		int userNumber = 339; 
 		int itemNumber = 5825;
-		float[][] randomedMatrix;
+		float[][] removedMatrix;
 		float[] itemRtList;
 		ArrayList<Integer> unreliableUser = new ArrayList<Integer>();
 		int[] userCount=new int[userNumber];
@@ -187,13 +179,13 @@ public class process {
 		
 		float density = (float)0.1;
 		
-		randomedMatrix = UtilityFunctions.readMatrix("removed/" + matrix + density + "_" + random, userNumber, itemNumber);
+		removedMatrix = UtilityFunctions.readMatrix("removed/" + matrix + density, userNumber, itemNumber);
 		tester.buildUserSetInUserList(userNumber);
 		tester.buildUserSetInItemList(itemNumber);
 		
 		for(int itemNo=0; itemNo<itemNumber; itemNo++){			
 			ArrayList<UserSet> userSetsInOneItem = new ArrayList<UserSet>();
-			itemRtList=tester.getItemRtList(itemNo, randomedMatrix, userNumber);
+			itemRtList=tester.getItemRtList(itemNo, removedMatrix, userNumber);
 			if(tester.userGreaterK(itemRtList)){
 				KMeans kMeans = new KMeans(itemRtList);
 				kMeans.cluster();
@@ -249,32 +241,18 @@ public class process {
 			}
 		}
 
-		KMeans kMeans2 = new KMeans(userCount);
-		kMeans2.cluster();
-		ArrayList<Integer> unRUL=kMeans2.getUnreliableUserList();
-//		kMeans2.printPoints();
-//		kMeans2.printClusters();
-//		kMeans2.printBelongs();
-//		System.out.println(unRUL.toString());
-		
-//		System.out.println();
-//		System.out.println("sorted");
-		
 		indexSorted = tester.sortIndex(userCount);
-//		for(int i=0; i<userNumber; i++){
-//			System.out.println("No."+i+" index="+indexSorted[i]+" countNum="+userCount[i]+"\t");
-//		}
+
 		tester.printUserSetInItems();
 //		tester.writeUser("userClusted.txt");
-		tester.bulidSimUserSet(userSetInUserList, unRUL);
+		tester.bulidSimUserSet(userSetInUserList);
 		for(int i=0; i<simUserSetList.size(); i++){
 			simUserSetList.get(i).sortSimUser();
 		}
 //		tester.printclustedUserList();
 		
 		float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", userNumber, itemNumber);
-		
-		Prediction prediction = new Prediction(originalMatrix, randomedMatrix, random, density, userNumber, itemNumber, unRUL, simUserSetList, userSetInItemList);
+		Prediction prediction = new Prediction(originalMatrix, removedMatrix, density, userNumber, itemNumber, simUserSetList, userSetInItemList);
 		prediction.cluserMean();
 	}
 }
