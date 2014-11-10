@@ -18,15 +18,12 @@ public class process {
 //		int userNumber = 339; 
 //		int itemNumber = 5825;
 		float[][] removedMatrix;
-		float[][] randomedMatrix;
 		
 		float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", this.userNumber, this.itemNumber);
 		float density = (float)0.1;
-		float random = (float)0.03;
 		
 		removedMatrix = UtilityFunctions.removeEntry(originalMatrix, density, "randomed//" + matrix + "30");			
-		randomedMatrix = UtilityFunctions.randomEntry(removedMatrix, random);
-		UtilityFunctions.writeMatrix(randomedMatrix, "randomed/"+ matrix + density + "_" + random);
+		UtilityFunctions.writeMatrix(removedMatrix, "removed/"+ matrix + density);
 	}
 	
 	public float[] getItemRtList(int itemNo, float[][] randomedMatrix, int userNumber){
@@ -188,13 +185,9 @@ public class process {
 		int[] userCount=new int[userNumber];
 		int[] indexSorted = new int[itemNumber];
 		
-		
-
-				
 		float density = (float)0.1;
-		float random = (float)0.03;
 		
-		randomedMatrix = UtilityFunctions.readMatrix("randomed/" + matrix + density + "_" + random, userNumber, itemNumber);
+		randomedMatrix = UtilityFunctions.readMatrix("removed/" + matrix + density + "_" + random, userNumber, itemNumber);
 		tester.buildUserSetInUserList(userNumber);
 		tester.buildUserSetInItemList(itemNumber);
 		
