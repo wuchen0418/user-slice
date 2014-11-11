@@ -317,7 +317,6 @@ public class Prediction {
 		if(commonRatedKey.size() == 0 || commonRatedKey.size() == 1) 
 			return -2;
 		
-		
 		double pcc = 0;
 		double upperAll = 0;
 		double downAll1 = 0;
