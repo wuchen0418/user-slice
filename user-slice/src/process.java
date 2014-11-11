@@ -243,7 +243,7 @@ public class process {
 
 		indexSorted = tester.sortIndex(userCount);
 
-		tester.printUserSetInItems();
+//		tester.printUserSetInItems();
 //		tester.writeUser("userClusted.txt");
 		tester.bulidSimUserSet(userSetInUserList);
 		for(int i=0; i<simUserSetList.size(); i++){
@@ -252,7 +252,8 @@ public class process {
 //		tester.printclustedUserList();
 		
 		float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", userNumber, itemNumber);
-		Prediction prediction = new Prediction(originalMatrix, removedMatrix, density, userNumber, itemNumber, simUserSetList, userSetInItemList);
-		prediction.cluserMean();
+		Prediction prediction = new Prediction();
+		prediction.cluserMean(originalMatrix, removedMatrix, density, userNumber, itemNumber, simUserSetList, userSetInItemList);
+		prediction.runUIPCC(originalMatrix, removedMatrix, density, 34);
 	}
 }

@@ -12,29 +12,30 @@ import java.util.Vector;
 
 
 public class Prediction {
-	private float[] URR_imean;
-	private float[] URR_umean;
-	private float[][] originalMatrix;
-	private float[][] removedMatrix;
-	private float density;
-	private int userNumber;
-	private int itemNumber;
+//	private float[] URR_imean;
+//	private float[] URR_umean;
+//	private float[][] originalMatrix;
+//	private float[][] removedMatrix;
+//	private float density;
+//	private int userNumber;
+//	private int itemNumber;
 	
-	private ArrayList<SimUserSet> simUserSetList;
-	private ArrayList<UserSetInItem> userSetInItemList;
+//	private ArrayList<SimUserSet> simUserSetList;
+//	private ArrayList<UserSetInItem> userSetInItemList;
 	
-	public Prediction(float[][] originalMatrix, float[][] removedMatrix,
-			float density,int userNum, int itemNum, ArrayList<SimUserSet> simUserSetList, ArrayList<UserSetInItem> userSetInItemList){
-		this.originalMatrix=originalMatrix;
-		this.removedMatrix=removedMatrix;
-		this.density=density;
-		this.userNumber=userNum;
-		this.itemNumber=itemNum;
-		this.simUserSetList=simUserSetList;
-		this.userSetInItemList=userSetInItemList;		
-	}
+//	public Prediction(float[][] originalMatrix, float[][] removedMatrix,
+//			float density,int userNum, int itemNum, ArrayList<SimUserSet> simUserSetList, ArrayList<UserSetInItem> userSetInItemList){
+//		this.originalMatrix=originalMatrix;
+//		this.removedMatrix=removedMatrix;
+//		this.density=density;
+//		this.userNumber=userNum;
+//		this.itemNumber=itemNum;
+//		this.simUserSetList=simUserSetList;
+//		this.userSetInItemList=userSetInItemList;		
+//	}
 	
-	public void cluserMean(){
+	public void cluserMean(float[][] originalMatrix, float[][] removedMatrix,
+			float density,int userNumber, int itemNumber, ArrayList<SimUserSet> simUserSetList, ArrayList<UserSetInItem> userSetInItemList){
 		System.out.println("Caculating begin: " + new Time(System.currentTimeMillis()));
 		float[][] predictedMatrix = new float[removedMatrix.length][removedMatrix[0].length];
 		
@@ -88,11 +89,11 @@ public class Prediction {
 			}
 		}
 		System.out.println("Caculating end: " + new Time(System.currentTimeMillis()));
-		System.out.println("MAE=" + MAE(predictedMatrix));
+		System.out.println("MAE=" + MAE(originalMatrix, removedMatrix, predictedMatrix));
 		UtilityFunctions.writeMatrix(predictedMatrix, "predicted/d"+density+".txt");
 	}
 		
-	public double MAE(float[][] predictedMatrix){
+	public double MAE(float[][] originalMatrix, float[][] removedMatrix ,float[][] predictedMatrix){
 		double allMAE = 0;
 		double number = 0;
 		for (int i = 0; i < originalMatrix.length; i++) {
@@ -107,10 +108,12 @@ public class Prediction {
 	}
 	
 	public void runUIPCC(float[][] originalMatrix, float[][] removedMatrix,
-			float density,int userNum, int itemNum, int topK, boolean isUPCC){
+			float density, int topK){
+		float[][] originalMatrixT = UtilityFunctions.matrixTransfer(originalMatrix);
+		float[][] removedMatrixT = UtilityFunctions.matrixTransfer(removedMatrix);
 		
 		float[] umean = UtilityFunctions.getUMean(removedMatrix);
-		float[] imean = UtilityFunctions.getUMean(removedMatrix);
+		float[] imean = UtilityFunctions.getUMean(removedMatrixT);
 		
 		double[] mae_uipcc = new double[11]; 
 		double[] rmse_uipcc = new double[11];
@@ -135,7 +138,8 @@ public class Prediction {
 			if(mae_uipcc[i] < smallMAE) smallMAE = mae_uipcc[i];
 			if(rmse_uipcc[i] < smallRMSE) smallRMSE = rmse_uipcc[i];
 		}		
-		UtilityFunctions.writeFile("result.txt", "L1_UIPCC:\t" + smallMAE + "\t" + smallRMSE + "\r\n");
+		UtilityFunctions.writeFile("result.txt", "UIPCC:\t" + smallMAE + "\t" + smallRMSE + "\r\n");
+		System.out.println("UIPCC MAE=" + smallMAE);
 	}
 	
 	
@@ -300,9 +304,7 @@ public class Prediction {
 		
 		return predictedMatrix;
 	}
-	
-	
-	
+		
 	public double getPCC(float[] u1, float[] u2, double mean1, double mean2){
 		// get the index of the common rated items.
 		Vector<Integer> commonRatedKey = new Vector<Integer>();
