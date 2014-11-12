@@ -114,7 +114,6 @@ public class process {
 			return true;
 		}
 		else{
-			System.out.println("count = "+count);
 			return false;
 		}
 			
@@ -271,7 +270,7 @@ public class process {
 //		for(int i=0; i<userNumber; i++){
 //			System.out.println("No."+i+" index="+indexSorted[i]+" countNum="+userCount[i]+"\t");
 //		}
-		tester.printUserSetInItems();
+//		tester.printUserSetInItems();
 //		tester.writeUser("userClusted.txt");
 		tester.bulidSimUserSet(userSetInUserList, unRUL);
 		for(int i=0; i<simUserSetList.size(); i++){
@@ -281,7 +280,10 @@ public class process {
 		
 		float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", userNumber, itemNumber);
 		
-		Prediction prediction = new Prediction(originalMatrix, randomedMatrix, random, density, userNumber, itemNumber, unRUL, simUserSetList, userSetInItemList);
-		prediction.cluserMean();
+		Prediction prediction = new Prediction();
+		prediction.cluserMean(originalMatrix, randomedMatrix, density, random, userNumber, itemNumber, unRUL, simUserSetList, userSetInItemList);
+		prediction.runUIPCC(originalMatrix, randomedMatrix, density, 34);
+		
+		
 	}
 }
