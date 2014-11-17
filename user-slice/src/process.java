@@ -175,115 +175,164 @@ public class process {
 	}
 	
 	public static void main(String[] args) {
-		String prefix = "WSDream-QoSDataset2/";
-		String matrix = "rtMatrix";
-		process tester= new process();
-		tester.preProcess();
-		int userNumber = 339; 
-		int itemNumber = 5825;
-		float[][] randomedMatrix;
-		float[] itemRtList;
-		ArrayList<Integer> unreliableUser = new ArrayList<Integer>();
-		int[] userCount=new int[userNumber];
-		int[] indexSorted = new int[itemNumber];
-		
-		
-
-				
-		float density = (float)0.1;
-		float random = (float)0.03;
-		
-		randomedMatrix = UtilityFunctions.readMatrix("randomed/" + matrix + density + "_" + random, userNumber, itemNumber);
-		tester.buildUserSetInUserList(userNumber);
-		tester.buildUserSetInItemList(itemNumber);
-		
-		for(int itemNo=0; itemNo<itemNumber; itemNo++){			
-			ArrayList<UserSet> userSetsInOneItem = new ArrayList<UserSet>();
-			itemRtList=tester.getItemRtList(itemNo, randomedMatrix, userNumber);
-			if(tester.userGreaterK(itemRtList)){
-				KMeans kMeans = new KMeans(itemRtList);
-				kMeans.cluster();
-				userSetsInOneItem = kMeans.buildUserSet(itemNo);
-				userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
-				
-				for(int i=0; i<userSetsInOneItem.size(); i++){
-					UserSet aUserSet = userSetsInOneItem.get(i);
-					ArrayList<Integer> usersInUserSet = new ArrayList<Integer>(); //store the userno in userSet
-					usersInUserSet = aUserSet.getUserNoList();
-					for(int u=0; u<usersInUserSet.size(); u++){
-						int userno = usersInUserSet.get(u);
-						UserSetInUser temUser = userSetInUserList.get(userno);
-						temUser.addUserSetInUserList(aUserSet);
-						userSetInUserList.set(userno, temUser);
-					}
-				}
-//				kMeans.printPoints();
-//				kMeans.printClusters();
-//				kMeans.printBelongs();
-				if(kMeans.getClustersNum()!=0){
-					unreliableUser = kMeans.getUnreliableUserList();
-//					if(unreliableUser.size()>0){
-						for(int i=0; i<unreliableUser.size();i++){
-							int userNo = unreliableUser.get(i);
-							userCount[userNo]++;
+		double mae_rmse_4method[][] = new double[21][8];
+		for(int count=0; count<20; count++){
+			String prefix = "WSDream-QoSDataset2/";
+			String matrix = "rtMatrix";
+			process tester= new process();
+			tester.preProcess();
+			int userNumber = 339; 
+			int itemNumber = 5825;
+			float[][] randomedMatrix;
+			float[] itemRtList;
+			ArrayList<Integer> unreliableUser = new ArrayList<Integer>();
+			int[] userCount=new int[userNumber];
+			int[] indexSorted = new int[itemNumber];
+			
+			float density = (float)0.1;
+			float random = (float)0.03;
+			
+			randomedMatrix = UtilityFunctions.readMatrix("randomed/" + matrix + density + "_" + random, userNumber, itemNumber);
+			tester.buildUserSetInUserList(userNumber);
+			tester.buildUserSetInItemList(itemNumber);
+			
+			for(int itemNo=0; itemNo<itemNumber; itemNo++){			
+				ArrayList<UserSet> userSetsInOneItem = new ArrayList<UserSet>();
+				itemRtList=tester.getItemRtList(itemNo, randomedMatrix, userNumber);
+				if(tester.userGreaterK(itemRtList)){
+					KMeans kMeans = new KMeans(itemRtList);
+					kMeans.cluster();
+					userSetsInOneItem = kMeans.buildUserSet(itemNo);
+					userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
+					
+					for(int i=0; i<userSetsInOneItem.size(); i++){
+						UserSet aUserSet = userSetsInOneItem.get(i);
+						ArrayList<Integer> usersInUserSet = new ArrayList<Integer>(); //store the userno in userSet
+						usersInUserSet = aUserSet.getUserNoList();
+						for(int u=0; u<usersInUserSet.size(); u++){
+							int userno = usersInUserSet.get(u);
+							UserSetInUser temUser = userSetInUserList.get(userno);
+							temUser.addUserSetInUserList(aUserSet);
+							userSetInUserList.set(userno, temUser);
 						}
-//						System.out.println(unreliableUser.toString());
-						unreliableUser.clear();
-//					}
-				}
-	
-			}
-			else{
-				for(int t=0; t<itemRtList.length; t++){
-					float x = itemRtList[t];
-					int c=0;
-					if(x!=-2&&x!=-1){
-						UserSet aUserSet = new UserSet(itemNo,c);
-						userSetsInOneItem.add(aUserSet);
-						c++;
-						
-						UserSetInUser temUser = userSetInUserList.get(t);
-						temUser.addUserSetInUserList(aUserSet);
-						userSetInUserList.set(t, temUser);
-						
 					}
+	//				kMeans.printPoints();
+	//				kMeans.printClusters();
+	//				kMeans.printBelongs();
+					if(kMeans.getClustersNum()!=0){
+						unreliableUser = kMeans.getUnreliableUserList();
+	//					if(unreliableUser.size()>0){
+							for(int i=0; i<unreliableUser.size();i++){
+								int userNo = unreliableUser.get(i);
+								userCount[userNo]++;
+							}
+	//						System.out.println(unreliableUser.toString());
+							unreliableUser.clear();
+	//					}
+					}
+		
 				}
-				if(userSetsInOneItem.size()==0){
-					System.out.println("userSetsInOneItem.size()==0");
+				else{
+					for(int t=0; t<itemRtList.length; t++){
+						float x = itemRtList[t];
+						int c=0;
+						if(x!=-2&&x!=-1){
+							UserSet aUserSet = new UserSet(itemNo,c);
+							userSetsInOneItem.add(aUserSet);
+							c++;
+							
+							UserSetInUser temUser = userSetInUserList.get(t);
+							temUser.addUserSetInUserList(aUserSet);
+							userSetInUserList.set(t, temUser);
+							
+						}
+					}
+	//				if(userSetsInOneItem.size()==0){
+	//					System.out.println("userSetsInOneItem.size()==0");
+	//				}
+					userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
 				}
-				userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
 			}
-		}
+	
+			KMeans kMeans2 = new KMeans(userCount);
+			kMeans2.cluster();
+			ArrayList<Integer> unRUL=kMeans2.getUnreliableUserList();
+	//		kMeans2.printPoints();
+	//		kMeans2.printClusters();
+	//		kMeans2.printBelongs();
+	//		System.out.println(unRUL.toString());
+			
+	//		System.out.println();
+	//		System.out.println("sorted");
+			
+			indexSorted = tester.sortIndex(userCount);
+	//		for(int i=0; i<userNumber; i++){
+	//			System.out.println("No."+i+" index="+indexSorted[i]+" countNum="+userCount[i]+"\t");
+	//		}
+	//		tester.printUserSetInItems();
+	//		tester.writeUser("userClusted.txt");
+			tester.bulidSimUserSet(userSetInUserList, unRUL);
+			for(int i=0; i<simUserSetList.size(); i++){
+				simUserSetList.get(i).sortSimUser();
+			}
+	//		tester.printclustedUserList();
+			
+			float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", userNumber, itemNumber);
+		
+		
+			Prediction prediction = new Prediction();
 
-		KMeans kMeans2 = new KMeans(userCount);
-		kMeans2.cluster();
-		ArrayList<Integer> unRUL=kMeans2.getUnreliableUserList();
-//		kMeans2.printPoints();
-//		kMeans2.printClusters();
-//		kMeans2.printBelongs();
-//		System.out.println(unRUL.toString());
-		
-//		System.out.println();
-//		System.out.println("sorted");
-		
-		indexSorted = tester.sortIndex(userCount);
-//		for(int i=0; i<userNumber; i++){
-//			System.out.println("No."+i+" index="+indexSorted[i]+" countNum="+userCount[i]+"\t");
-//		}
-//		tester.printUserSetInItems();
-//		tester.writeUser("userClusted.txt");
-		tester.bulidSimUserSet(userSetInUserList, unRUL);
-		for(int i=0; i<simUserSetList.size(); i++){
-			simUserSetList.get(i).sortSimUser();
+			double[] mae_rmse_cluster = prediction.cluserMean(originalMatrix, randomedMatrix, density, random, userNumber, itemNumber, unRUL, simUserSetList, userSetInItemList);
+			double[] mae_rmse_3method = prediction.runUIPCC(originalMatrix, randomedMatrix, density, 34);
+			System.arraycopy(mae_rmse_3method, 0, mae_rmse_4method[count], 0, 3);
+			System.arraycopy(mae_rmse_3method, 3, mae_rmse_4method[count], 4, 3);
+			System.arraycopy(mae_rmse_cluster, 0, mae_rmse_4method[count], 3, 1);
+			System.arraycopy(mae_rmse_cluster, 1, mae_rmse_4method[count], 7, 1);
+			
+			System.out.println("mae__rmse_4method = \t"+mae_rmse_4method[count][0]+"\t"+mae_rmse_4method[count][1]+"\t"+mae_rmse_4method[count][2]+"\t"+mae_rmse_4method[count][3]
+					+"\t"+mae_rmse_4method[count][4]+"\t"+mae_rmse_4method[count][5]+"\t"+mae_rmse_4method[count][6]+"\t"+mae_rmse_4method[count][7]);
 		}
-//		tester.printclustedUserList();
+		double mae_upcc_mean = 0;
+		double mae_ipcc_mean = 0;
+		double mae_uipcc_mean = 0;
+		double mae_cluster_mean = 0;
 		
-		float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", userNumber, itemNumber);
+		double rmse_upcc_mean = 0;
+		double rmse_ipcc_mean = 0;
+		double rmse_uipcc_mean = 0;
+		double rmse_cluster_mean = 0;
+		for(int t=0; t<20; t++){
+			mae_upcc_mean += mae_rmse_4method[t][0];
+			mae_ipcc_mean += mae_rmse_4method[t][1];
+			mae_uipcc_mean += mae_rmse_4method[t][2];
+			mae_cluster_mean += mae_rmse_4method[t][3];
+			
+			rmse_upcc_mean += mae_rmse_4method[t][4];
+			rmse_ipcc_mean += mae_rmse_4method[t][5];
+			rmse_uipcc_mean += mae_rmse_4method[t][6];
+			rmse_cluster_mean += mae_rmse_4method[t][7];
+		}
+		mae_upcc_mean = mae_upcc_mean/20;
+		mae_ipcc_mean = mae_ipcc_mean/20;
+		mae_uipcc_mean = mae_uipcc_mean/20;
+		mae_cluster_mean = mae_cluster_mean/20;
 		
-		Prediction prediction = new Prediction();
-		prediction.cluserMean(originalMatrix, randomedMatrix, density, random, userNumber, itemNumber, unRUL, simUserSetList, userSetInItemList);
-		prediction.runUIPCC(originalMatrix, randomedMatrix, density, 34);
+		rmse_upcc_mean = rmse_upcc_mean/20;
+		rmse_ipcc_mean = rmse_ipcc_mean/20;
+		rmse_uipcc_mean = rmse_uipcc_mean/20;
+		rmse_cluster_mean = rmse_cluster_mean/20;
 		
+		mae_rmse_4method[20][0]=mae_upcc_mean;
+		mae_rmse_4method[20][1]=mae_ipcc_mean;
+		mae_rmse_4method[20][2]=mae_uipcc_mean;
+		mae_rmse_4method[20][3]=mae_cluster_mean;
 		
+		mae_rmse_4method[20][4] = rmse_upcc_mean;
+		mae_rmse_4method[20][5] = rmse_ipcc_mean;
+		mae_rmse_4method[20][6] = rmse_uipcc_mean;
+		mae_rmse_4method[20][7] = rmse_cluster_mean;
+		
+		System.out.println("mae__rmse_4method(mean) = \t"+mae_rmse_4method[20][0]+"\t"+mae_rmse_4method[20][1]+"\t"+mae_rmse_4method[20][2]+"\t"+mae_rmse_4method[20][3]
+				+"\t"+mae_rmse_4method[20][4]+"\t"+mae_rmse_4method[20][5]+"\t"+mae_rmse_4method[20][6]+"\t"+mae_rmse_4method[20][7]);
 	}
 }

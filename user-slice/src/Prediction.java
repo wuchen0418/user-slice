@@ -1,4 +1,6 @@
+import java.math.BigDecimal;
 import java.sql.Time;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,11 +14,11 @@ import java.util.Vector;
 
 
 public class Prediction {	
-	public void cluserMean(float[][] originalMatrix, float[][] randomedMatrix,
+	public double[] cluserMean(float[][] originalMatrix, float[][] randomedMatrix,
 			float density, float random,int userNumber, int itemNumber, ArrayList<Integer> unreliableUserList, ArrayList<SimUserSet> simUserSetList, ArrayList<UserSetInItem> userSetInItemList){
 		//outlier has been removed
 		randomedMatrix = removeOutlier(unreliableUserList,randomedMatrix);
-		System.out.println("Caculating begin: " + new Time(System.currentTimeMillis()));
+//		System.out.println("Caculating begin: " + new Time(System.currentTimeMillis()));
 		
 		float[] umean = UtilityFunctions.getUMean(randomedMatrix);
 		float[][] predictedMatrix = new float[randomedMatrix.length][randomedMatrix[0].length];
@@ -45,7 +47,6 @@ public class Prediction {
 					for(int u=0;u<aSimUserSet.getSimUserList().size();u++){
 						SimUser aSimUser = aSimUserSet.getSimUser(u);
 						if(userNoInItem.contains(aSimUser.getUserNo())){ //simuser invoke the item
-							simFlag=1;
 							UserSet aUserSet = aUserSetInItem.getUserSet(aSimUser.getUserNo());
 							ArrayList<Integer> clustedUserNoList = aUserSet.getUserNoList();
 							float clusterMean=0;
@@ -57,18 +58,14 @@ public class Prediction {
 								}
 							}
 							if(count!=0){
+								simFlag=1;
 								clusterMean=clusterMean/count; //get the cluster Mean of the cluster
+								predictedMatrix[i][j] = clusterMean;
+								break;
 							}
-							else{
-								clusterMean=umean[i]; // all simUsers are outliers
-							}
-							predictedMatrix[i][j] = clusterMean;
-							break;
 						}
-//						else{ //simuser dose not invoke the item
-//							continue; 
-//						}
 					}
+					if(simFlag==0) predictedMatrix[i][j] = umean[i]; //no simUser, use UMEAN
 					continue;
 				}
 				else{
@@ -76,9 +73,15 @@ public class Prediction {
 				}
 			}
 		}
-		System.out.println("Caculating end: " + new Time(System.currentTimeMillis()));
-		System.out.println("MAE=" + MAE(originalMatrix, randomedMatrix, predictedMatrix));
-		UtilityFunctions.writeMatrix(predictedMatrix, "predicted/d"+density+"r"+random+"random.txt");
+//		System.out.println("Caculating end: " + new Time(System.currentTimeMillis()));
+		double mae_rmse_cluster[] = new double[2];
+		mae_rmse_cluster[0] = MAE(originalMatrix, randomedMatrix, predictedMatrix);
+		mae_rmse_cluster[1] = RMSE(originalMatrix, randomedMatrix, predictedMatrix);
+		System.out.println("MAE=" + mae_rmse_cluster[0]);
+		System.out.println("RMSE=" + mae_rmse_cluster[1]);
+//		UtilityFunctions.writeMatrix(predictedMatrix, "predicted/d"+density+"r"+random+"random.txt");
+		
+		return mae_rmse_cluster;
 	}
 	
 	public float[][] removeOutlier(ArrayList<Integer> unreliableUserList,float[][] randomedMatrix){
@@ -88,9 +91,6 @@ public class Prediction {
 		for(int i=0; i<unreliableUserList.size(); i++){
 			int userno=unreliableUserList.get(i);
 			for(int j=0; j<resultMatrix[userno].length;j++)
-//			if(randomedMatrix[userno][j]!=-1&&randomedMatrix[userno][j]!=-2){
-//				
-//			}
 				resultMatrix[userno][j]=-3; // outlier
 		}
 		return resultMatrix;
@@ -107,11 +107,31 @@ public class Prediction {
 				}
 			}
 		}
+		
 		return allMAE/number;
 	}
 	
-	public void runUIPCC(float[][] originalMatrix, float[][] randomedMatrix,
-			float density, int topK){
+	public double RMSE(float[][] originalMatrix, float[][] randomedMatrix ,float[][] predictedMatrix){
+		float allRMSE = 0;
+		float allRMSEMatrix[][] = new float[originalMatrix.length][originalMatrix[0].length];
+		double number = 0;
+		for (int i = 0; i < originalMatrix.length; i++) {
+			for (int j = 0; j < originalMatrix[0].length; j++) {
+				if(randomedMatrix[i][j] == -2 && originalMatrix[i][j] != -1 && predictedMatrix[i][j] != -3) {
+//					float f =(predictedMatrix[i][j] - originalMatrix[i][j])*(predictedMatrix[i][j] - originalMatrix[i][j]);
+//					BigDecimal b = new BigDecimal(f);
+//					float f1 = b.setScale(4,BigDecimal.ROUND_HALF_UP).floatValue(); 
+					allRMSEMatrix[i][j] = (predictedMatrix[i][j] - originalMatrix[i][j])*(predictedMatrix[i][j] - originalMatrix[i][j]);
+					allRMSE += allRMSEMatrix[i][j];
+					number ++;
+				}
+			}
+		}
+		return Math.sqrt(allRMSE/number);
+	}
+	
+	public double[] runUIPCC(float[][] originalMatrix, float[][] randomedMatrix, float density, int topK){
+		double mae_rmse_3method[] = new double[6];	
 		float[][] originalMatrixT = UtilityFunctions.matrixTransfer(originalMatrix);
 		float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
 		
@@ -124,15 +144,19 @@ public class Prediction {
 		float[][] predictedMatrixUPCC = UPCC(originalMatrix, randomedMatrix, umean, topK);
 		float[][] predictedMatrixIPCC = IPCC(originalMatrix, randomedMatrix, imean, topK);
 		float[][] predictedMatrixIPCCT = UtilityFunctions.matrixTransfer(predictedMatrixIPCC);
+		double mae_upcc = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixUPCC);
+		double mae_ipcc = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixIPCC);
+		
+		double rmse_upcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixUPCC);
+		double rmse_ipcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixIPCC);
 		mae_uipcc = new double[11]; 
 		rmse_uipcc = new double[11]; 
 		for (int i = 0; i < 11; i++) {
 			//对lambda值从0到1进行尝试，选择效果最好的作为最终结果
 			double lambda2 = (double)i/10.0;
 			float[][] predictedMatrixURR_UIPCC = UIPCC(predictedMatrixUPCC, predictedMatrixIPCCT, lambda2);
-			mae_uipcc[i] =   UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC);
+			mae_uipcc[i] =  UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC);
 			rmse_uipcc[i] = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC);
-//			System.out.println("UIPCC:" + i + "\t" + mae2[i] + "\t" + rmse2[i]);
 		}
 
 		double smallMAE = 100;
@@ -141,8 +165,16 @@ public class Prediction {
 			if(mae_uipcc[i] < smallMAE) smallMAE = mae_uipcc[i];
 			if(rmse_uipcc[i] < smallRMSE) smallRMSE = rmse_uipcc[i];
 		}		
-		UtilityFunctions.writeFile("result.txt", "UIPCC:\t" + smallMAE + "\t" + smallRMSE + "\r\n");
-		System.out.println("UIPCC MAE=" + smallMAE);
+//		UtilityFunctions.writeFile("UIPCCresult.txt", "UIPCC:\t" + smallMAE + "\t" + smallRMSE + "\r\n");
+		mae_rmse_3method[0] = mae_upcc;
+		mae_rmse_3method[1] = mae_ipcc;
+		mae_rmse_3method[2] = smallMAE;
+		
+		mae_rmse_3method[3] = rmse_upcc;
+		mae_rmse_3method[4] = rmse_ipcc;
+		mae_rmse_3method[5] = smallRMSE;
+		
+		return mae_rmse_3method;
 	}
 	
 	
