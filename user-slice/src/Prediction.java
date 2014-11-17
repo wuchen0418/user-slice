@@ -11,50 +11,15 @@ import java.util.Map;
 import java.util.Vector;
 
 
-public class Prediction {
-//	private ArrayList<Map> upccList;
-//	private ArrayList<Map> ipccList;
-//	private float[] URR_L1AVG;
-//	private float[] URR_L2AVG;
-//	private float[] URR_Cluster_AVG;
-//	private float[] URR_imean;
-//	private float[] URR_umean;
-//	private ArrayList<Integer> unreliableUserList;
-//	private HashMap userLocationMap; 
-//	private Vector<String> country = new Vector<String>();
-//	private float[][] originalMatrix;
-//	private float[][] randomedMatrix;
-//	private float[][] predictedMatrix;
-//	private float random;
-//	private float density;
-//	private int userNumber;
-//	private int itemNumber;
-//	
-//	private ArrayList<SimUserSet> simUserSetList;
-//	private ArrayList<UserSetInItem> userSetInItemList;
-//	
-//	public Prediction(float[][] originalMatrix, float[][] randomedMatrix, float random, 
-//			float density,int userNum, int itemNum, ArrayList<Integer> unreliableUserList, ArrayList<SimUserSet> simUserSetList, ArrayList<UserSetInItem> userSetInItemList){
-//		this.originalMatrix=originalMatrix;
-//		this.randomedMatrix=randomedMatrix;
-//		this.random=random;
-//		this.density=density;
-//		this.unreliableUserList=unreliableUserList;
-//		this.userNumber=userNum;
-//		this.itemNumber=itemNum;
-//		this.simUserSetList=simUserSetList;
-//		this.userSetInItemList=userSetInItemList;		
-//	}
-//		
+public class Prediction {	
 	public void cluserMean(float[][] originalMatrix, float[][] randomedMatrix,
 			float density, float random,int userNumber, int itemNumber, ArrayList<Integer> unreliableUserList, ArrayList<SimUserSet> simUserSetList, ArrayList<UserSetInItem> userSetInItemList){
 		//outlier has been removed
 		randomedMatrix = removeOutlier(unreliableUserList,randomedMatrix);
 		System.out.println("Caculating begin: " + new Time(System.currentTimeMillis()));
 		
+		float[] umean = UtilityFunctions.getUMean(randomedMatrix);
 		float[][] predictedMatrix = new float[randomedMatrix.length][randomedMatrix[0].length];
-		
-		
 		for(int i=0; i<userNumber; i++){
 			SimUserSet aSimUserSet = simUserSetList.get(i);
 			for(int j=0; j<itemNumber; j++){
@@ -95,14 +60,14 @@ public class Prediction {
 								clusterMean=clusterMean/count; //get the cluster Mean of the cluster
 							}
 							else{
-								clusterMean=0; // all simUsers are outliers
+								clusterMean=umean[i]; // all simUsers are outliers
 							}
 							predictedMatrix[i][j] = clusterMean;
 							break;
 						}
-						else{ //simuser dose not invoke the item
-							continue; 
-						}
+//						else{ //simuser dose not invoke the item
+//							continue; 
+//						}
 					}
 					continue;
 				}
