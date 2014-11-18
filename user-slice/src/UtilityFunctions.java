@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -617,18 +618,55 @@ public class UtilityFunctions {
 		return allMAE/number;
 	}
 	
-	
-	public static double RMSE(float[][] originalMatrix, float[][] removedMatrix, float[][] predictedMatrix){
-		double allRMSE = 0;
+	public static double NMAE(float[][] originalMatrix, float[][] removedMatrix, float[][] predictedMatrix){
+		double allMAE = 0;
 		double number = 0;
+		double allNMAE = 0;
 		for (int i = 0; i < originalMatrix.length; i++) {
 			for (int j = 0; j < originalMatrix[0].length; j++) {
 				if(removedMatrix[i][j] == -2 && originalMatrix[i][j] != -1 && predictedMatrix[i][j] != -2) {
-					allRMSE += (predictedMatrix[i][j] - originalMatrix[i][j])*(predictedMatrix[i][j] - originalMatrix[i][j]);
+					allMAE += Math.abs(predictedMatrix[i][j] - originalMatrix[i][j]);
 					number ++;
 				}
 			}
 		}
+		allMAE = allMAE/number;
+		for (int i = 0; i < originalMatrix.length; i++) {
+			for (int j = 0; j < originalMatrix[0].length; j++) {
+				if(removedMatrix[i][j] == -2 && originalMatrix[i][j] != -1 && predictedMatrix[i][j] != -2) {
+					allNMAE += originalMatrix[i][j]/number;
+				}
+			}
+		}
+		
+		return allMAE/allNMAE;
+	}
+	
+	public static double RMSE(float[][] originalMatrix, float[][] removedMatrix, float[][] predictedMatrix, String fileName){
+		double allRMSE = 0;
+		double number = 0;
+		
+		float allRMSEMatrix[][] = new float[originalMatrix.length][originalMatrix[0].length];
+		
+		for (int i = 0; i < originalMatrix.length; i++) {
+			for (int j = 0; j < originalMatrix[0].length; j++) {
+				if(removedMatrix[i][j] == -2 && originalMatrix[i][j] != -1 && predictedMatrix[i][j] != -2) {
+//					allRMSE += (predictedMatrix[i][j] - originalMatrix[i][j])*(predictedMatrix[i][j] - originalMatrix[i][j]);
+					
+					float f =(predictedMatrix[i][j] - originalMatrix[i][j])*(predictedMatrix[i][j] - originalMatrix[i][j]);
+					BigDecimal b = new BigDecimal(f);
+					float f1 = b.setScale(4,BigDecimal.ROUND_HALF_UP).floatValue(); 
+//					allRMSEMatrix[i][j] = (predictedMatrix[i][j] - originalMatrix[i][j])*(predictedMatrix[i][j] - originalMatrix[i][j]);
+					allRMSEMatrix[i][j] = f1;
+					allRMSE += allRMSEMatrix[i][j];
+					
+					number ++;
+				}
+			}
+		}
+		
+		UtilityFunctions.writeMatrix(allRMSEMatrix, fileName);
+		
 		return Math.sqrt(allRMSE/number);
 	}
 	

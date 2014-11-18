@@ -118,16 +118,42 @@ public class Prediction {
 		for (int i = 0; i < originalMatrix.length; i++) {
 			for (int j = 0; j < originalMatrix[0].length; j++) {
 				if(randomedMatrix[i][j] == -2 && originalMatrix[i][j] != -1 && predictedMatrix[i][j] != -3) {
-//					float f =(predictedMatrix[i][j] - originalMatrix[i][j])*(predictedMatrix[i][j] - originalMatrix[i][j]);
-//					BigDecimal b = new BigDecimal(f);
-//					float f1 = b.setScale(4,BigDecimal.ROUND_HALF_UP).floatValue(); 
-					allRMSEMatrix[i][j] = (predictedMatrix[i][j] - originalMatrix[i][j])*(predictedMatrix[i][j] - originalMatrix[i][j]);
+					float f =(predictedMatrix[i][j] - originalMatrix[i][j])*(predictedMatrix[i][j] - originalMatrix[i][j]);
+					BigDecimal b = new BigDecimal(f);
+					float f1 = b.setScale(4,BigDecimal.ROUND_HALF_UP).floatValue(); 
+//					allRMSEMatrix[i][j] = (predictedMatrix[i][j] - originalMatrix[i][j])*(predictedMatrix[i][j] - originalMatrix[i][j]);
+					allRMSEMatrix[i][j] = f1;
 					allRMSE += allRMSEMatrix[i][j];
 					number ++;
 				}
 			}
 		}
+		UtilityFunctions.writeMatrix(allRMSEMatrix, "RMSEResult/rmse_cluster.txt");
 		return Math.sqrt(allRMSE/number);
+	}
+	
+	public double NMAE(float[][] originalMatrix, float[][] randomedMatrix ,float[][] predictedMatrix){
+		double allMAE = 0;
+		double number = 0;
+		double allNMAE = 0;
+		for (int i = 0; i < originalMatrix.length; i++) {
+			for (int j = 0; j < originalMatrix[0].length; j++) {
+				if(randomedMatrix[i][j] == -2 && originalMatrix[i][j] != -1 && predictedMatrix[i][j] != -3) {
+					allMAE += Math.abs(predictedMatrix[i][j] - originalMatrix[i][j]);
+					number ++;
+				}
+			}
+		}
+		allMAE = allMAE/number;
+		for (int i = 0; i < originalMatrix.length; i++) {
+			for (int j = 0; j < originalMatrix[0].length; j++) {
+				if(randomedMatrix[i][j] == -2 && originalMatrix[i][j] != -1 && predictedMatrix[i][j] != -3) {
+					allNMAE += originalMatrix[i][j]/number;
+				}
+			}
+		}
+		
+		return allMAE/allNMAE;
 	}
 	
 	public double[] runUIPCC(float[][] originalMatrix, float[][] randomedMatrix, float density, int topK){
@@ -147,8 +173,8 @@ public class Prediction {
 		double mae_upcc = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixUPCC);
 		double mae_ipcc = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixIPCC);
 		
-		double rmse_upcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixUPCC);
-		double rmse_ipcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixIPCC);
+		double rmse_upcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixUPCC, "RMSEResult/rmse_upcc.txt");
+		double rmse_ipcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixIPCC, "RMSEResult/rmse_ipcc.txt");
 		mae_uipcc = new double[11]; 
 		rmse_uipcc = new double[11]; 
 		for (int i = 0; i < 11; i++) {
@@ -156,7 +182,7 @@ public class Prediction {
 			double lambda2 = (double)i/10.0;
 			float[][] predictedMatrixURR_UIPCC = UIPCC(predictedMatrixUPCC, predictedMatrixIPCCT, lambda2);
 			mae_uipcc[i] =  UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC);
-			rmse_uipcc[i] = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC);
+			rmse_uipcc[i] = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC, "RMSEResult/rmse_uipcc.txt");
 		}
 
 		double smallMAE = 100;
