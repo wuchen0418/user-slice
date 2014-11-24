@@ -76,9 +76,10 @@ public class Prediction {
 //		System.out.println("Caculating end: " + new Time(System.currentTimeMillis()));
 		double mae_rmse_cluster[] = new double[2];
 		mae_rmse_cluster[0] = MAE(originalMatrix, randomedMatrix, predictedMatrix);
-		mae_rmse_cluster[1] = RMSE(originalMatrix, randomedMatrix, predictedMatrix);
-		System.out.println("MAE=" + mae_rmse_cluster[0]);
-		System.out.println("RMSE=" + mae_rmse_cluster[1]);
+		mae_rmse_cluster[1] = NMAE(originalMatrix, randomedMatrix, predictedMatrix);
+//		mae_rmse_cluster[1] = RMSE(originalMatrix, randomedMatrix, predictedMatrix);
+//		System.out.println("MAE=" + mae_rmse_cluster[0]);
+//		System.out.println("RMSE=" + mae_rmse_cluster[1]);
 //		UtilityFunctions.writeMatrix(predictedMatrix, "predicted/d"+density+"r"+random+"random.txt");
 		
 		return mae_rmse_cluster;
@@ -165,6 +166,7 @@ public class Prediction {
 		float[] imean = UtilityFunctions.getUMean(randomedMatrixT);
 		
 		double[] mae_uipcc = new double[11]; 
+		double[] nmae_uipcc = new double[11]; 
 		double[] rmse_uipcc = new double[11];
 		
 		float[][] predictedMatrixUPCC = UPCC(originalMatrix, randomedMatrix, umean, topK);
@@ -173,32 +175,43 @@ public class Prediction {
 		double mae_upcc = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixUPCC);
 		double mae_ipcc = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixIPCC);
 		
-		double rmse_upcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixUPCC, "RMSEResult/rmse_upcc.txt");
-		double rmse_ipcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixIPCC, "RMSEResult/rmse_ipcc.txt");
+		double nmae_upcc = UtilityFunctions.NMAE(originalMatrix, randomedMatrix, predictedMatrixUPCC);
+		double nmae_ipcc = UtilityFunctions.NMAE(originalMatrix, randomedMatrix, predictedMatrixIPCC);
+		
+//		double rmse_upcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixUPCC, "RMSEResult/rmse_upcc.txt");
+//		double rmse_ipcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixIPCC, "RMSEResult/rmse_ipcc.txt");
 		mae_uipcc = new double[11]; 
+		nmae_uipcc = new double[11]; 
 		rmse_uipcc = new double[11]; 
 		for (int i = 0; i < 11; i++) {
 			//对lambda值从0到1进行尝试，选择效果最好的作为最终结果
 			double lambda2 = (double)i/10.0;
 			float[][] predictedMatrixURR_UIPCC = UIPCC(predictedMatrixUPCC, predictedMatrixIPCCT, lambda2);
 			mae_uipcc[i] =  UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC);
-			rmse_uipcc[i] = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC, "RMSEResult/rmse_uipcc.txt");
+			nmae_uipcc[i] =  UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC);
+//			rmse_uipcc[i] = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC, "RMSEResult/rmse_uipcc.txt");
 		}
 
 		double smallMAE = 100;
 		double smallRMSE = 100;
+		double smallNMAE = 100;
 		for (int i = 0; i < 11; i++) {
 			if(mae_uipcc[i] < smallMAE) smallMAE = mae_uipcc[i];
-			if(rmse_uipcc[i] < smallRMSE) smallRMSE = rmse_uipcc[i];
+			if(nmae_uipcc[i] < smallNMAE) smallNMAE = nmae_uipcc[i];
+//			if(rmse_uipcc[i] < smallRMSE) smallRMSE = rmse_uipcc[i];
 		}		
 //		UtilityFunctions.writeFile("UIPCCresult.txt", "UIPCC:\t" + smallMAE + "\t" + smallRMSE + "\r\n");
 		mae_rmse_3method[0] = mae_upcc;
 		mae_rmse_3method[1] = mae_ipcc;
 		mae_rmse_3method[2] = smallMAE;
 		
-		mae_rmse_3method[3] = rmse_upcc;
-		mae_rmse_3method[4] = rmse_ipcc;
-		mae_rmse_3method[5] = smallRMSE;
+		mae_rmse_3method[3] = nmae_upcc;
+		mae_rmse_3method[4] = nmae_ipcc;
+		mae_rmse_3method[5] = smallNMAE;
+		
+//		mae_rmse_3method[3] = rmse_upcc;
+//		mae_rmse_3method[4] = rmse_ipcc;
+//		mae_rmse_3method[5] = smallRMSE;
 		
 		return mae_rmse_3method;
 	}
