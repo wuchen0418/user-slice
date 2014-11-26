@@ -80,7 +80,6 @@ public class Prediction {
 		double nmae=0;
 		mae=MAE(originalMatrix, randomedMatrix, predictedMatrix);
 		allnmae = allNMAE(originalMatrix, randomedMatrix, predictedMatrix);
-		System.out.println("cluster allnmae=" + allnmae);
 		nmae=NMAE(mae,allnmae);
 		mae_rmse_cluster[0] = mae;
 		mae_rmse_cluster[1] = nmae;
@@ -176,7 +175,6 @@ public class Prediction {
 		double mae_upcc = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixUPCC);
 		double mae_ipcc = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixIPCC);
 		double allNMAE = UtilityFunctions.allNMAE(originalMatrix, randomedMatrix, predictedMatrixIPCC);
-		System.out.println("pcc allnmae=" + allNMAE);
 		
 		double nmae_upcc = UtilityFunctions.NMAE(mae_upcc,allNMAE);
 		double nmae_ipcc = UtilityFunctions.NMAE(mae_ipcc,allNMAE);
