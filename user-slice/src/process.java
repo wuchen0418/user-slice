@@ -22,7 +22,7 @@ public class process {
 		
 		float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", this.userNumber, this.itemNumber);
 		float density = (float)0.1;
-		float random = (float)0.015;
+		float random = (float)0.03;
 		
 		removedMatrix = UtilityFunctions.removeEntry(originalMatrix, density, "randomed//" + matrix + "30");			
 		randomedMatrix = UtilityFunctions.randomEntry(removedMatrix, random);
@@ -176,8 +176,7 @@ public class process {
 	
 	public static void main(String[] args) {
 		double mae_rmse_4method[][] = new double[21][8];
-		int loopNum=20;
-		for(int count=0; count<loopNum; count++){
+		for(int count=0; count<20; count++){
 			String prefix = "WSDream-QoSDataset2/";
 			String matrix = "rtMatrix";
 			process tester= new process();
@@ -191,7 +190,7 @@ public class process {
 			int[] indexSorted = new int[itemNumber];
 			
 			float density = (float)0.1;
-			float random = (float)0.015;
+			float random = (float)0.03;
 			
 			randomedMatrix = UtilityFunctions.readMatrix("randomed/" + matrix + density + "_" + random, userNumber, itemNumber);
 			tester.buildUserSetInUserList(userNumber);
@@ -313,15 +312,15 @@ public class process {
 			rmse_uipcc_mean += mae_rmse_4method[t][6];
 			rmse_cluster_mean += mae_rmse_4method[t][7];
 		}
-		mae_upcc_mean = mae_upcc_mean/loopNum;
-		mae_ipcc_mean = mae_ipcc_mean/loopNum;
-		mae_uipcc_mean = mae_uipcc_mean/loopNum;
-		mae_cluster_mean = mae_cluster_mean/loopNum;
+		mae_upcc_mean = mae_upcc_mean/20;
+		mae_ipcc_mean = mae_ipcc_mean/20;
+		mae_uipcc_mean = mae_uipcc_mean/20;
+		mae_cluster_mean = mae_cluster_mean/20;
 		
-		rmse_upcc_mean = rmse_upcc_mean/loopNum;
-		rmse_ipcc_mean = rmse_ipcc_mean/loopNum;
-		rmse_uipcc_mean = rmse_uipcc_mean/loopNum;
-		rmse_cluster_mean = rmse_cluster_mean/loopNum;
+		rmse_upcc_mean = rmse_upcc_mean/20;
+		rmse_ipcc_mean = rmse_ipcc_mean/20;
+		rmse_uipcc_mean = rmse_uipcc_mean/20;
+		rmse_cluster_mean = rmse_cluster_mean/20;
 		
 		mae_rmse_4method[20][0]=mae_upcc_mean;
 		mae_rmse_4method[20][1]=mae_ipcc_mean;
