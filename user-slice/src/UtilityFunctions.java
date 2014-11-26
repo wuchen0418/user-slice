@@ -618,28 +618,23 @@ public class UtilityFunctions {
 		return allMAE/number;
 	}
 	
-	public static double NMAE(float[][] originalMatrix, float[][] removedMatrix, float[][] predictedMatrix){
-		double allMAE = 0;
+	public static double allNMAE(float[][] originalMatrix, float[][] removedMatrix, float[][] predictedMatrix){
 		double number = 0;
 		double allNMAE = 0;
 		for (int i = 0; i < originalMatrix.length; i++) {
 			for (int j = 0; j < originalMatrix[0].length; j++) {
-				if(removedMatrix[i][j] == -2 && originalMatrix[i][j] != -1 && predictedMatrix[i][j] != -2) {
-					allMAE += Math.abs(predictedMatrix[i][j] - originalMatrix[i][j]);
-					number ++;
+				if(originalMatrix[i][j] > 0) {
+					allNMAE += originalMatrix[i][j];
+					number++;
 				}
 			}
 		}
-		allMAE = allMAE/number;
-		for (int i = 0; i < originalMatrix.length; i++) {
-			for (int j = 0; j < originalMatrix[0].length; j++) {
-				if(removedMatrix[i][j] == -2 && originalMatrix[i][j] != -1 && predictedMatrix[i][j] != -2) {
-					allNMAE += originalMatrix[i][j]/number;
-				}
-			}
-		}
-		
-		return allMAE/allNMAE;
+		allNMAE = allNMAE/number;
+		return allNMAE;
+	}
+	
+	public static double NMAE(double mae, double allNMAE){
+		return mae/allNMAE;
 	}
 	
 	public static double RMSE(float[][] originalMatrix, float[][] removedMatrix, float[][] predictedMatrix, String fileName){

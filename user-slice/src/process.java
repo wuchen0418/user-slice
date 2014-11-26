@@ -22,7 +22,7 @@ public class process {
 		
 		float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", this.userNumber, this.itemNumber);
 		float density = (float)0.1;
-		float random = (float)0.03;
+		float random = (float)0.015;
 		
 		removedMatrix = UtilityFunctions.removeEntry(originalMatrix, density, "randomed//" + matrix + "30");			
 		randomedMatrix = UtilityFunctions.randomEntry(removedMatrix, random);
@@ -176,7 +176,7 @@ public class process {
 	
 	public static void main(String[] args) {
 		double mae_rmse_4method[][] = new double[21][8];
-		int loopNum=1;
+		int loopNum=20;
 		for(int count=0; count<loopNum; count++){
 			String prefix = "WSDream-QoSDataset2/";
 			String matrix = "rtMatrix";
@@ -191,7 +191,7 @@ public class process {
 			int[] indexSorted = new int[itemNumber];
 			
 			float density = (float)0.1;
-			float random = (float)0.03;
+			float random = (float)0.015;
 			
 			randomedMatrix = UtilityFunctions.readMatrix("randomed/" + matrix + density + "_" + random, userNumber, itemNumber);
 			tester.buildUserSetInUserList(userNumber);
