@@ -289,7 +289,7 @@ public class process {
 			System.arraycopy(mae_rmse_cluster, 0, mae_rmse_4method[count], 3, 1);
 			System.arraycopy(mae_rmse_cluster, 1, mae_rmse_4method[count], 7, 1);
 			
-			System.out.println("mae__rmse_4method = \t"+mae_rmse_4method[count][0]+"\t"+mae_rmse_4method[count][1]+"\t"+mae_rmse_4method[count][2]+"\t"+mae_rmse_4method[count][3]
+			System.out.println(count+": "+"mae__rmse_4method = \t"+mae_rmse_4method[count][0]+"\t"+mae_rmse_4method[count][1]+"\t"+mae_rmse_4method[count][2]+"\t"+mae_rmse_4method[count][3]
 					+"\t"+mae_rmse_4method[count][4]+"\t"+mae_rmse_4method[count][5]+"\t"+mae_rmse_4method[count][6]+"\t"+mae_rmse_4method[count][7]);
 		}
 		double mae_upcc_mean = 0;
