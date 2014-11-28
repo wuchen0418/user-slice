@@ -7,7 +7,7 @@ import java.util.Random;
 public class KMeans 
 {
 	private static int itemnum; 
-	private static int K=6;
+	private static int K=7;
 	private  ArrayList<Point> points = new ArrayList<Point>();
 	private  ArrayList<Cluster> clusters = new ArrayList<Cluster>();
 	private static double lastE = Double.MAX_VALUE;
