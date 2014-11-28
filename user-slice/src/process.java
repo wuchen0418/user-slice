@@ -21,8 +21,9 @@ public class process {
 		float[][] randomedMatrix;
 		
 		float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", this.userNumber, this.itemNumber);
-		float density = (float)0.4;
-		float random = (float)0.03;
+		
+		float density = (float)0.1;
+		float random = (float)0.035;
 		
 		removedMatrix = UtilityFunctions.removeEntry(originalMatrix, density, "randomed//" + matrix + "30");			
 		randomedMatrix = UtilityFunctions.randomEntry(removedMatrix, random);
@@ -190,8 +191,8 @@ public class process {
 			int[] userCount=new int[userNumber];
 			int[] indexSorted = new int[itemNumber];
 			
-			float density = (float)0.4;
-			float random = (float)0.03;
+			float density = (float)0.1;
+			float random = (float)0.035;
 			
 			randomedMatrix = UtilityFunctions.readMatrix("randomed/" + matrix + density + "_" + random, userNumber, itemNumber);
 			tester.buildUserSetInUserList(userNumber);
