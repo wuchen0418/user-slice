@@ -23,7 +23,7 @@ public class process {
 		float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", this.userNumber, this.itemNumber);
 		
 		float density = (float)0.1;
-		float random = (float)0.035;
+		float random = (float)0.04;
 		
 		removedMatrix = UtilityFunctions.removeEntry(originalMatrix, density, "randomed//" + matrix + "30");			
 		randomedMatrix = UtilityFunctions.randomEntry(removedMatrix, random);
@@ -192,7 +192,7 @@ public class process {
 			int[] indexSorted = new int[itemNumber];
 			
 			float density = (float)0.1;
-			float random = (float)0.035;
+			float random = (float)0.04;
 			
 			randomedMatrix = UtilityFunctions.readMatrix("randomed/" + matrix + density + "_" + random, userNumber, itemNumber);
 			tester.buildUserSetInUserList(userNumber);
@@ -285,9 +285,9 @@ public class process {
 			Prediction prediction = new Prediction();
 
 			double[] mae_rmse_cluster = prediction.cluserMean(originalMatrix, randomedMatrix, density, random, userNumber, itemNumber, unRUL, simUserSetList, userSetInItemList);
-			double[] mae_rmse_3method = prediction.runUIPCC(originalMatrix, randomedMatrix, density, 34);
-			System.arraycopy(mae_rmse_3method, 0, mae_rmse_4method[count], 0, 3);
-			System.arraycopy(mae_rmse_3method, 3, mae_rmse_4method[count], 4, 3);
+//			double[] mae_rmse_3method = prediction.runUIPCC(originalMatrix, randomedMatrix, density, 34);
+//			System.arraycopy(mae_rmse_3method, 0, mae_rmse_4method[count], 0, 3);
+//			System.arraycopy(mae_rmse_3method, 3, mae_rmse_4method[count], 4, 3);
 			System.arraycopy(mae_rmse_cluster, 0, mae_rmse_4method[count], 3, 1);
 			System.arraycopy(mae_rmse_cluster, 1, mae_rmse_4method[count], 7, 1);
 			
