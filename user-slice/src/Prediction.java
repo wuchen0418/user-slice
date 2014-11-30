@@ -86,7 +86,7 @@ public class Prediction {
 		mae_rmse_cluster[1] = RMSE(originalMatrix, randomedMatrix, predictedMatrix);
 //		System.out.println("MAE=" + mae_rmse_cluster[0]);
 //		System.out.println("RMSE=" + mae_rmse_cluster[1]);
-//		UtilityFunctions.writeMatrix(predictedMatrix, "predicted/d"+density+"r"+random+"random.txt");
+		UtilityFunctions.writeMatrix(predictedMatrix, "RMSEResult/predicted/d"+density+"r"+random+"Cluster.txt");
 		
 		return mae_rmse_cluster;
 	}
@@ -190,6 +190,7 @@ public class Prediction {
 			//对lambda值从0到1进行尝试，选择效果最好的作为最终结果
 			double lambda2 = (double)i/10.0;
 			float[][] predictedMatrixURR_UIPCC = UIPCC(predictedMatrixUPCC, predictedMatrixIPCCT, lambda2);
+//			UtilityFunctions.writeMatrix(predictedMatrixURR_UIPCC, "RMSEResult/predicted/UIPCC"+i+".txt");
 //			mae = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC);
 //			nmae = UtilityFunctions.NMAE(mae,allNMAE);
 //			mae_uipcc[i] =  mae;

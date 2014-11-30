@@ -188,7 +188,7 @@ public class process {
 			float[] itemRtList;
 			ArrayList<Integer> unreliableUser = new ArrayList<Integer>();
 			int[] userCount=new int[userNumber];
-			int[] indexSorted = new int[itemNumber];
+			int[] indexSorted = new int[userNumber];
 			
 			float density = (float)0.1;
 			float random = (float)0.03;
@@ -234,9 +234,9 @@ public class process {
 		
 				}
 				else{
+					int c=0;
 					for(int t=0; t<itemRtList.length; t++){
 						float x = itemRtList[t];
-						int c=0;
 						if(x!=-2&&x!=-1){
 							UserSet aUserSet = new UserSet(itemNo,c);
 							userSetsInOneItem.add(aUserSet);
@@ -266,7 +266,7 @@ public class process {
 	//		System.out.println();
 	//		System.out.println("sorted");
 			
-			indexSorted = tester.sortIndex(userCount);
+//			indexSorted = tester.sortIndex(userCount);
 	//		for(int i=0; i<userNumber; i++){
 	//			System.out.println("No."+i+" index="+indexSorted[i]+" countNum="+userCount[i]+"\t");
 	//		}

@@ -81,5 +81,9 @@ public class SimUserSet
 			}
 		}
 	}
+	public void printSimUser(int userNo){
+		
+		System.out.println("user "+userNo +" has simUser: " +simUserList.toString() );
+	}
 	
 }
