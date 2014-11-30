@@ -165,58 +165,58 @@ public class Prediction {
 		float[] umean = UtilityFunctions.getUMean(randomedMatrix);
 		float[] imean = UtilityFunctions.getUMean(randomedMatrixT);
 		
-//		double[] mae_uipcc = new double[11]; 
-//		double[] nmae_uipcc = new double[11]; 
+		double[] mae_uipcc = new double[11]; 
+		double[] nmae_uipcc = new double[11]; 
 		double[] rmse_uipcc = new double[11];
 		
 		float[][] predictedMatrixUPCC = UPCC(originalMatrix, randomedMatrix, umean, topK);
 		float[][] predictedMatrixIPCC = IPCC(originalMatrix, randomedMatrix, imean, topK);
 		float[][] predictedMatrixIPCCT = UtilityFunctions.matrixTransfer(predictedMatrixIPCC);
-//		double mae_upcc = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixUPCC);
-//		double mae_ipcc = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixIPCC);
-//		double allNMAE = UtilityFunctions.allNMAE(originalMatrix, randomedMatrix, predictedMatrixIPCC);
-//		
-//		double nmae_upcc = UtilityFunctions.NMAE(mae_upcc,allNMAE);
-//		double nmae_ipcc = UtilityFunctions.NMAE(mae_ipcc,allNMAE);
+		double mae_upcc = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixUPCC);
+		double mae_ipcc = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixIPCC);
+		double allNMAE = UtilityFunctions.allNMAE(originalMatrix, randomedMatrix, predictedMatrixIPCC);
 		
-		double rmse_upcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixUPCC, "RMSEResult/rmse_upcc.txt");
-		double rmse_ipcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixIPCC, "RMSEResult/rmse_ipcc.txt");
-//		mae_uipcc = new double[11]; 
-//		nmae_uipcc = new double[11]; 
-//		rmse_uipcc = new double[11]; 
+		double nmae_upcc = UtilityFunctions.NMAE(mae_upcc,allNMAE);
+		double nmae_ipcc = UtilityFunctions.NMAE(mae_ipcc,allNMAE);
+		
+//		double rmse_upcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixUPCC, "RMSEResult/rmse_upcc.txt");
+//		double rmse_ipcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixIPCC, "RMSEResult/rmse_ipcc.txt");
+		mae_uipcc = new double[11]; 
+		nmae_uipcc = new double[11]; 
+		rmse_uipcc = new double[11]; 
 		for (int i = 0; i < 11; i++) {
 			double mae =0;
 			double nmae =0;
 			//对lambda值从0到1进行尝试，选择效果最好的作为最终结果
 			double lambda2 = (double)i/10.0;
 			float[][] predictedMatrixURR_UIPCC = UIPCC(predictedMatrixUPCC, predictedMatrixIPCCT, lambda2);
-//			mae = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC);
-//			nmae = UtilityFunctions.NMAE(mae,allNMAE);
-//			mae_uipcc[i] =  mae;
-//			nmae_uipcc[i] =  nmae;
-			rmse_uipcc[i] = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC, "RMSEResult/rmse_uipcc_"+i+".txt");
+			mae = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC);
+			nmae = UtilityFunctions.NMAE(mae,allNMAE);
+			mae_uipcc[i] =  mae;
+			nmae_uipcc[i] =  nmae;
+//			rmse_uipcc[i] = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC, "RMSEResult/rmse_uipcc.txt");
 		}
 
 		double smallMAE = 100;
 		double smallRMSE = 100;
 		double smallNMAE = 100;
 		for (int i = 0; i < 11; i++) {
-//			if(mae_uipcc[i] < smallMAE) smallMAE = mae_uipcc[i];
-//			if(nmae_uipcc[i] < smallNMAE) smallNMAE = nmae_uipcc[i];
-			if(rmse_uipcc[i] < smallRMSE) smallRMSE = rmse_uipcc[i];
+			if(mae_uipcc[i] < smallMAE) smallMAE = mae_uipcc[i];
+			if(nmae_uipcc[i] < smallNMAE) smallNMAE = nmae_uipcc[i];
+//			if(rmse_uipcc[i] < smallRMSE) smallRMSE = rmse_uipcc[i];
 		}		
 //		UtilityFunctions.writeFile("UIPCCresult.txt", "UIPCC:\t" + smallMAE + "\t" + smallRMSE + "\r\n");
-//		mae_rmse_3method[0] = mae_upcc;
-//		mae_rmse_3method[1] = mae_ipcc;
-//		mae_rmse_3method[2] = smallMAE;
+		mae_rmse_3method[0] = mae_upcc;
+		mae_rmse_3method[1] = mae_ipcc;
+		mae_rmse_3method[2] = smallMAE;
 		
-//		mae_rmse_3method[3] = nmae_upcc;
-//		mae_rmse_3method[4] = nmae_ipcc;
-//		mae_rmse_3method[5] = smallNMAE;
+		mae_rmse_3method[3] = nmae_upcc;
+		mae_rmse_3method[4] = nmae_ipcc;
+		mae_rmse_3method[5] = smallNMAE;
 		
-		mae_rmse_3method[3] = rmse_upcc;
-		mae_rmse_3method[4] = rmse_ipcc;
-		mae_rmse_3method[5] = smallRMSE;
+//		mae_rmse_3method[3] = rmse_upcc;
+//		mae_rmse_3method[4] = rmse_ipcc;
+//		mae_rmse_3method[5] = smallRMSE;
 		
 		return mae_rmse_3method;
 	}
