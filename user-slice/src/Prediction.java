@@ -81,9 +81,9 @@ public class Prediction {
 		mae=MAE(originalMatrix, randomedMatrix, predictedMatrix);
 		allnmae = allNMAE(originalMatrix, randomedMatrix, predictedMatrix);
 		nmae=NMAE(mae,allnmae);
-		mae_rmse_cluster[0] = mae;
-		mae_rmse_cluster[1] = nmae;
-//		mae_rmse_cluster[1] = RMSE(originalMatrix, randomedMatrix, predictedMatrix);
+//		mae_rmse_cluster[0] = mae;
+//		mae_rmse_cluster[1] = nmae;
+		mae_rmse_cluster[1] = RMSE(originalMatrix, randomedMatrix, predictedMatrix);
 //		System.out.println("MAE=" + mae_rmse_cluster[0]);
 //		System.out.println("RMSE=" + mae_rmse_cluster[1]);
 //		UtilityFunctions.writeMatrix(predictedMatrix, "predicted/d"+density+"r"+random+"random.txt");
@@ -134,7 +134,7 @@ public class Prediction {
 				}
 			}
 		}
-//		UtilityFunctions.writeMatrix(allRMSEMatrix, "RMSEResult/rmse_cluster.txt");
+		UtilityFunctions.writeMatrix(allRMSEMatrix, "RMSEResult/rmse_cluster.txt");
 		return Math.sqrt(allRMSE/number);
 	}
 	
