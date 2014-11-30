@@ -165,10 +165,9 @@ public class Prediction {
 		float[] umean = UtilityFunctions.getUMean(randomedMatrix);
 		float[] imean = UtilityFunctions.getUMean(randomedMatrixT);
 		
-		double[] mae_uipcc = new double[11]; 
-		double[] nmae_uipcc = new double[11]; 
+//		double[] mae_uipcc = new double[11]; 
+//		double[] nmae_uipcc = new double[11]; 
 		double[] rmse_uipcc = new double[11];
-		
 		
 		float[][] predictedMatrixUPCC = UPCC(originalMatrix, randomedMatrix, umean, topK);
 		float[][] predictedMatrixIPCC = IPCC(originalMatrix, randomedMatrix, imean, topK);
@@ -182,8 +181,8 @@ public class Prediction {
 		
 //		double rmse_upcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixUPCC, "RMSEResult/rmse_upcc.txt");
 //		double rmse_ipcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixIPCC, "RMSEResult/rmse_ipcc.txt");
-		mae_uipcc = new double[11]; 
-		nmae_uipcc = new double[11]; 
+//		mae_uipcc = new double[11]; 
+//		nmae_uipcc = new double[11]; 
 		rmse_uipcc = new double[11]; 
 		for (int i = 0; i < 11; i++) {
 			double mae =0;
@@ -193,8 +192,8 @@ public class Prediction {
 			float[][] predictedMatrixURR_UIPCC = UIPCC(predictedMatrixUPCC, predictedMatrixIPCCT, lambda2);
 			mae = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC);
 			nmae = UtilityFunctions.NMAE(mae,allNMAE);
-			mae_uipcc[i] =  mae;
-			nmae_uipcc[i] =  nmae;
+//			mae_uipcc[i] =  mae;
+//			nmae_uipcc[i] =  nmae;
 //			rmse_uipcc[i] = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC, "RMSEResult/rmse_uipcc.txt");
 		}
 
@@ -202,9 +201,9 @@ public class Prediction {
 		double smallRMSE = 100;
 		double smallNMAE = 100;
 		for (int i = 0; i < 11; i++) {
-			if(mae_uipcc[i] < smallMAE) smallMAE = mae_uipcc[i];
-			if(nmae_uipcc[i] < smallNMAE) smallNMAE = nmae_uipcc[i];
-//			if(rmse_uipcc[i] < smallRMSE) smallRMSE = rmse_uipcc[i];
+//			if(mae_uipcc[i] < smallMAE) smallMAE = mae_uipcc[i];
+//			if(nmae_uipcc[i] < smallNMAE) smallNMAE = nmae_uipcc[i];
+			if(rmse_uipcc[i] < smallRMSE) smallRMSE = rmse_uipcc[i];
 		}		
 //		UtilityFunctions.writeFile("UIPCCresult.txt", "UIPCC:\t" + smallMAE + "\t" + smallRMSE + "\r\n");
 		mae_rmse_3method[0] = mae_upcc;
