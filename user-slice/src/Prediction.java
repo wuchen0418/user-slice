@@ -169,6 +169,7 @@ public class Prediction {
 		double[] nmae_uipcc = new double[11]; 
 		double[] rmse_uipcc = new double[11];
 		
+		
 		float[][] predictedMatrixUPCC = UPCC(originalMatrix, randomedMatrix, umean, topK);
 		float[][] predictedMatrixIPCC = IPCC(originalMatrix, randomedMatrix, imean, topK);
 		float[][] predictedMatrixIPCCT = UtilityFunctions.matrixTransfer(predictedMatrixIPCC);
