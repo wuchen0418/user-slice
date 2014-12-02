@@ -204,7 +204,17 @@ public class process {
 					KMeans kMeans = new KMeans(itemRtList);
 					kMeans.cluster();
 					userSetsInOneItem = kMeans.buildUserSet(itemNo);
+					
 					userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
+					
+					//user 164's rtime is large, find its sim user
+					if(itemRtList[163]>0){
+						System.out.println("itemNo:"+itemNo+" User 164's rttime is " + itemRtList[163]);
+						for(int i=0; i<userSetsInOneItem.size(); i++){
+							userSetsInOneItem.get(i).printElements();
+						}
+					}
+				
 					
 					for(int i=0; i<userSetsInOneItem.size(); i++){
 						UserSet aUserSet = userSetsInOneItem.get(i);
@@ -275,7 +285,9 @@ public class process {
 			tester.bulidSimUserSet(userSetInUserList, unRUL);
 			for(int i=0; i<simUserSetList.size(); i++){
 				simUserSetList.get(i).sortSimUser();
+				
 			}
+			simUserSetList.get(163).printSimUser();
 	//		tester.printclustedUserList();
 			
 			float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", userNumber, itemNumber);

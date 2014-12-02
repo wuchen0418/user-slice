@@ -81,12 +81,18 @@ public class SimUserSet
 			}
 		}
 	}
-	public void printSimUser(int userNo){
-		System.out.println("user "+userNo +" has simUser: ");
-		for(int i=0; i<this.simUserList.size(); i++){
-			System.out.println("user "+userNo +" has simUser: " +simUserList.get(i).getUserNo() );
+	public void printSimUser(){
+		System.out.println("user "+this.userNo +" has simUser:\t");
+		if(this.simUserList.size()>=20){
+			for(int i=0; i<20; i++){
+				System.out.print(simUserList.get(i).getUserNo()+"\t" );
+			}
 		}
-		
+		else{
+			for(int i=0; i<this.simUserList.size(); i++){
+				System.out.print(simUserList.get(i).getUserNo()+"\t" );
+			}
+		}
+		System.out.println();
 	}
-	
 }
