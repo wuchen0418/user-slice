@@ -208,12 +208,12 @@ public class process {
 					userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
 					
 					//user 164's rtime is large, find its sim user
-					if(itemRtList[163]>0){
-						System.out.println("itemNo:"+itemNo+" User 164's rttime is " + itemRtList[163]);
-						for(int i=0; i<userSetsInOneItem.size(); i++){
-							userSetsInOneItem.get(i).printElements();
-						}
-					}
+//					if(itemRtList[163]>0){
+//						System.out.println("itemNo:"+itemNo+" User 164's rttime is " + itemRtList[163]);
+//						for(int i=0; i<userSetsInOneItem.size(); i++){
+//							userSetsInOneItem.get(i).printElements();
+//						}
+//					}
 				
 					
 					for(int i=0; i<userSetsInOneItem.size(); i++){
@@ -249,6 +249,7 @@ public class process {
 						float x = itemRtList[t];
 						if(x!=-2&&x!=-1){
 							UserSet aUserSet = new UserSet(itemNo,c);
+							aUserSet.addUser(t);
 							userSetsInOneItem.add(aUserSet);
 							c++;
 							
@@ -287,7 +288,7 @@ public class process {
 				simUserSetList.get(i).sortSimUser();
 				
 			}
-			simUserSetList.get(163).printSimUser();
+//			simUserSetList.get(163).printSimUser();
 	//		tester.printclustedUserList();
 			
 			float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", userNumber, itemNumber);

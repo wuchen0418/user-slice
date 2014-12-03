@@ -44,13 +44,13 @@ public class Prediction {
 				}
 				
 				else if(randomedMatrix[i][j]==-2){
-					int topK=5;
+					int topK=3;
 					int simUserClusterCount=0;
 					float allClusterMean=0;
 					for(int u=0;u<aSimUserSet.getSimUserList().size();u++){
 						SimUser aSimUser = aSimUserSet.getSimUser(u);
 						if(userNoInItem.contains(aSimUser.getUserNo())){ //simuser invoke the item
-							simUserClusterCount++;
+							
 							UserSet aUserSet = aUserSetInItem.getUserSet(aSimUser.getUserNo());
 							ArrayList<Integer> clustedUserNoList = aUserSet.getUserNoList();
 							float clusterMean=0;
@@ -61,7 +61,11 @@ public class Prediction {
 									simUserInAClusterCount++;
 								}
 							}
+							if(simUserInAClusterCount==0){
+								System.out.println("simUserInAClusterCount==0");
+							}
 							if(simUserInAClusterCount!=0){
+								simUserClusterCount++;
 								simFlag=1;
 								allClusterMean+=clusterMean/simUserInAClusterCount; //get the cluster Mean of the cluster
 							}
@@ -93,7 +97,7 @@ public class Prediction {
 		mae_rmse_cluster[1] = RMSE(originalMatrix, randomedMatrix, predictedMatrix);
 //		System.out.println("MAE=" + mae_rmse_cluster[0]);
 //		System.out.println("RMSE=" + mae_rmse_cluster[1]);
-		UtilityFunctions.writeMatrix(predictedMatrix, "RMSEResult/predicted/d"+density+"r"+random+"Cluster.txt");
+//		UtilityFunctions.writeMatrix(predictedMatrix, "RMSEResult/predicted/d"+density+"r"+random+"Cluster.txt");
 		
 		return mae_rmse_cluster;
 	}
@@ -132,16 +136,16 @@ public class Prediction {
 			for (int j = 0; j < originalMatrix[0].length; j++) {
 				if(randomedMatrix[i][j] == -2 && originalMatrix[i][j] != -1 && predictedMatrix[i][j] != -3) {
 					float f =(predictedMatrix[i][j] - originalMatrix[i][j])*(predictedMatrix[i][j] - originalMatrix[i][j]);
-					BigDecimal b = new BigDecimal(f);
-					float f1 = b.setScale(4,BigDecimal.ROUND_HALF_UP).floatValue(); 
+//					BigDecimal b = new BigDecimal(f);
+//					float f1 = b.setScale(4,BigDecimal.ROUND_HALF_UP).floatValue(); 
 //					allRMSEMatrix[i][j] = (predictedMatrix[i][j] - originalMatrix[i][j])*(predictedMatrix[i][j] - originalMatrix[i][j]);
-					allRMSEMatrix[i][j] = f1;
+					allRMSEMatrix[i][j] = f;
 					allRMSE += allRMSEMatrix[i][j];
 					number ++;
 				}
 			}
 		}
-		UtilityFunctions.writeMatrix(allRMSEMatrix, "RMSEResult/rmse_cluster.txt");
+//		UtilityFunctions.writeMatrix(allRMSEMatrix, "RMSEResult/rmse_cluster.txt");
 		return Math.sqrt(allRMSE/number);
 	}
 	
@@ -213,7 +217,7 @@ public class Prediction {
 //			if(nmae_uipcc[i] < smallNMAE) smallNMAE = nmae_uipcc[i];
 			if(rmse_uipcc[i] < smallRMSE){
 				smallRMSE = rmse_uipcc[i];
-				System.out.println(i + " is better");
+//				System.out.println(i + " is better");
 			}
 		}		
 //		UtilityFunctions.writeFile("UIPCCresult.txt", "UIPCC:\t" + smallMAE + "\t" + smallRMSE + "\r\n");

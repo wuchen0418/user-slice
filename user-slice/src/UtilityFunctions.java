@@ -660,7 +660,7 @@ public class UtilityFunctions {
 			}
 		}
 		
-		UtilityFunctions.writeMatrix(allRMSEMatrix, fileName);
+//		UtilityFunctions.writeMatrix(allRMSEMatrix, fileName);
 		
 		return Math.sqrt(allRMSE/number);
 	}
