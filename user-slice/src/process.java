@@ -135,7 +135,7 @@ public class process {
 	}
 	
 	public void printclustedUserList(){
-		for(int i = 0;i < 1;i++)
+		for(int i = 0;i < 20;i++)
 //		for(int i = 0;i < simUserSetList.size();i++)
 		{
 			SimUserSet tempUser = simUserSetList.get(i);
