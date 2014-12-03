@@ -135,7 +135,7 @@ public class process {
 	}
 	
 	public void printclustedUserList(){
-		for(int i = 0;i < 20;i++)
+		for(int i = 0;i < 1;i++)
 //		for(int i = 0;i < simUserSetList.size();i++)
 		{
 			SimUserSet tempUser = simUserSetList.get(i);
@@ -176,7 +176,7 @@ public class process {
 	
 	public static void main(String[] args) {
 		double mae_rmse_4method[][] = new double[21][8];
-		int loopNum = 1;
+		int loopNum = 20;
 		for(int count=0; count<loopNum; count++){
 			String prefix = "WSDream-QoSDataset2/";
 			String matrix = "rtMatrix";
