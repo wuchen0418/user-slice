@@ -110,7 +110,7 @@ public class process {
 				count++;
 			}
 		}
-		if(count>=7){
+		if(count>=6){
 			return true;
 		}
 		else{

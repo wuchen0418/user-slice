@@ -35,7 +35,7 @@ public class KMeans
 		try
 		{
 			this.itemnum = URR.length;
-			K = 3;
+			K = 6;
 
 			for (int t=0;t<URR.length;t++){
 				double x = URR[t];
