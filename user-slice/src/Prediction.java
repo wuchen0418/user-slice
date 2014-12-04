@@ -44,7 +44,7 @@ public class Prediction {
 				}
 				
 				else if(randomedMatrix[i][j]==-2){
-					int topK=2;
+					int topK=3;
 					int simUserClusterCount=0;
 					float allClusterMean=0;
 					for(int u=0;u<aSimUserSet.getSimUserList().size();u++){
