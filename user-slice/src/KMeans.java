@@ -31,11 +31,11 @@ public class KMeans
 	}
 	
 	
-	public KMeans(float[] URR){
+	public KMeans(float[] URR, int K){
 		try
 		{
 			this.itemnum = URR.length;
-			K = 6;
+			this.K = K;
 
 			for (int t=0;t<URR.length;t++){
 				double x = URR[t];

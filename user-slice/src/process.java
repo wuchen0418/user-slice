@@ -102,7 +102,7 @@ public class process {
         }
 	}
 	
-	public Boolean userGreaterK(float[] URR){
+	public Boolean userGreaterK(float[] URR, int K){
 		int count = 0;
 		for (int t=0;t<URR.length;t++){
 			double x = URR[t];
@@ -110,7 +110,7 @@ public class process {
 				count++;
 			}
 		}
-		if(count>=6){
+		if(count>=K){
 			return true;
 		}
 		else{
@@ -184,6 +184,7 @@ public class process {
 			tester.preProcess();
 			int userNumber = 339; 
 			int itemNumber = 5825;
+			int K=7;
 			float[][] randomedMatrix;
 			float[] itemRtList;
 			ArrayList<Integer> unreliableUser = new ArrayList<Integer>();
@@ -200,8 +201,8 @@ public class process {
 			for(int itemNo=0; itemNo<itemNumber; itemNo++){			
 				ArrayList<UserSet> userSetsInOneItem = new ArrayList<UserSet>();
 				itemRtList=tester.getItemRtList(itemNo, randomedMatrix, userNumber);
-				if(tester.userGreaterK(itemRtList)){
-					KMeans kMeans = new KMeans(itemRtList);
+				if(tester.userGreaterK(itemRtList,K)){
+					KMeans kMeans = new KMeans(itemRtList,K);
 					kMeans.cluster();
 					userSetsInOneItem = kMeans.buildUserSet(itemNo);
 					
