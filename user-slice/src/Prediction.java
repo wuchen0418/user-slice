@@ -18,9 +18,12 @@ public class Prediction {
 			float density, float random,int userNumber, int itemNumber, ArrayList<Integer> unreliableUserList, ArrayList<SimUserSet> simUserSetList, ArrayList<UserSetInItem> userSetInItemList){
 		//outlier has been removed
 		randomedMatrix = removeOutlier(unreliableUserList,randomedMatrix);
+		float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
 //		System.out.println("Caculating begin: " + new Time(System.currentTimeMillis()));
 		
 		float[] umean = UtilityFunctions.getUMean(randomedMatrix);
+		float[] imean = UtilityFunctions.getUMean(randomedMatrixT);
+		
 		float[][] predictedMatrix = new float[randomedMatrix.length][randomedMatrix[0].length];
 		for(int i=0; i<userNumber; i++){
 			SimUserSet aSimUserSet = simUserSetList.get(i);
@@ -75,8 +78,12 @@ public class Prediction {
 							predictedMatrix[i][j] = allClusterMean/topK;
 							break;
 						}
+						
+						if(u==aSimUserSet.getSimUserList().size()-1&&simUserClusterCount<topK&&simUserClusterCount!=0){
+							predictedMatrix[i][j] = allClusterMean/simUserClusterCount;
+						}
 					}
-					if(simFlag==0) predictedMatrix[i][j] = umean[i]; //no simUser, use UMEAN
+					if(simUserClusterCount==0) predictedMatrix[i][j] = umean[i]; //no simUser, use UMEAN
 					continue;
 				}
 				else{
@@ -97,7 +104,7 @@ public class Prediction {
 		mae_rmse_cluster[1] = RMSE(originalMatrix, randomedMatrix, predictedMatrix);
 //		System.out.println("MAE=" + mae_rmse_cluster[0]);
 //		System.out.println("RMSE=" + mae_rmse_cluster[1]);
-//		UtilityFunctions.writeMatrix(predictedMatrix, "RMSEResult/predicted/d"+density+"r"+random+"Cluster.txt");
+		UtilityFunctions.writeMatrix(predictedMatrix, "RMSEResult/predicted/d"+density+"r"+random+"Cluster.txt");
 		
 		return mae_rmse_cluster;
 	}
@@ -136,16 +143,13 @@ public class Prediction {
 			for (int j = 0; j < originalMatrix[0].length; j++) {
 				if(randomedMatrix[i][j] == -2 && originalMatrix[i][j] != -1 && predictedMatrix[i][j] != -3) {
 					float f =(predictedMatrix[i][j] - originalMatrix[i][j])*(predictedMatrix[i][j] - originalMatrix[i][j]);
-//					BigDecimal b = new BigDecimal(f);
-//					float f1 = b.setScale(4,BigDecimal.ROUND_HALF_UP).floatValue(); 
-//					allRMSEMatrix[i][j] = (predictedMatrix[i][j] - originalMatrix[i][j])*(predictedMatrix[i][j] - originalMatrix[i][j]);
 					allRMSEMatrix[i][j] = f;
 					allRMSE += allRMSEMatrix[i][j];
 					number ++;
 				}
 			}
 		}
-//		UtilityFunctions.writeMatrix(allRMSEMatrix, "RMSEResult/rmse_cluster.txt");
+		UtilityFunctions.writeMatrix(allRMSEMatrix, "RMSEResult/rmse_cluster.txt");
 		return Math.sqrt(allRMSE/number);
 	}
 	
@@ -182,6 +186,10 @@ public class Prediction {
 		
 		float[][] predictedMatrixUPCC = UPCC(originalMatrix, randomedMatrix, umean, topK);
 		float[][] predictedMatrixIPCC = IPCC(originalMatrix, randomedMatrix, imean, topK);
+		
+		UtilityFunctions.writeMatrix(predictedMatrixUPCC, "RMSEResult/predicted/d"+density+"upcc.txt");
+		UtilityFunctions.writeMatrix(predictedMatrixIPCC, "RMSEResult/predicted/d"+density+"ipcc.txt");
+		
 		float[][] predictedMatrixIPCCT = UtilityFunctions.matrixTransfer(predictedMatrixIPCC);
 		double mae_upcc = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixUPCC);
 		double mae_ipcc = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixIPCC);
