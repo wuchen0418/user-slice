@@ -6,8 +6,8 @@ import java.util.Random;
 
 public class KMeans 
 {
-	private static int itemnum; 
-	private static int K=7;
+	private int itemnum; 
+	private int K;
 	private  ArrayList<Point> points = new ArrayList<Point>();
 	private  ArrayList<Cluster> clusters = new ArrayList<Cluster>();
 	private static double lastE = Double.MAX_VALUE;
@@ -34,8 +34,8 @@ public class KMeans
 	public KMeans(float[] URR){
 		try
 		{
-			itemnum = URR.length;
-//			K = 7;
+			this.itemnum = URR.length;
+			K = 6;
 
 			for (int t=0;t<URR.length;t++){
 				double x = URR[t];

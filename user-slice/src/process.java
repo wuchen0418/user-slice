@@ -6,9 +6,9 @@ import java.util.ArrayList;
 
 public class process {
 
-	private static ArrayList<UserSetInUser> userSetInUserList = new ArrayList<UserSetInUser>();
-	private static ArrayList<UserSetInItem> userSetInItemList = new ArrayList<UserSetInItem>();
-	private static ArrayList<SimUserSet> simUserSetList = new ArrayList<SimUserSet>();
+	private ArrayList<UserSetInUser> userSetInUserList = new ArrayList<UserSetInUser>();
+	private ArrayList<UserSetInItem> userSetInItemList = new ArrayList<UserSetInItem>();
+	private ArrayList<SimUserSet> simUserSetList = new ArrayList<SimUserSet>();
 	private int userNumber = 339;
 	private int itemNumber = 5825;
 
@@ -110,7 +110,7 @@ public class process {
 				count++;
 			}
 		}
-		if(count>=7){
+		if(count>=6){
 			return true;
 		}
 		else{
@@ -205,7 +205,7 @@ public class process {
 					kMeans.cluster();
 					userSetsInOneItem = kMeans.buildUserSet(itemNo);
 					
-					userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
+					tester.userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
 					
 					//user 164's rtime is large, find its sim user
 //					if(itemRtList[163]>0){
@@ -222,9 +222,9 @@ public class process {
 						usersInUserSet = aUserSet.getUserNoList();
 						for(int u=0; u<usersInUserSet.size(); u++){
 							int userno = usersInUserSet.get(u);
-							UserSetInUser temUser = userSetInUserList.get(userno);
+							UserSetInUser temUser = tester.userSetInUserList.get(userno);
 							temUser.addUserSetInUserList(aUserSet);
-							userSetInUserList.set(userno, temUser);
+							tester.userSetInUserList.set(userno, temUser);
 						}
 					}
 	//				kMeans.printPoints();
@@ -253,16 +253,16 @@ public class process {
 							userSetsInOneItem.add(aUserSet);
 							c++;
 							
-							UserSetInUser temUser = userSetInUserList.get(t);
+							UserSetInUser temUser = tester.userSetInUserList.get(t);
 							temUser.addUserSetInUserList(aUserSet);
-							userSetInUserList.set(t, temUser);
+							tester.userSetInUserList.set(t, temUser);
 							
 						}
 					}
 	//				if(userSetsInOneItem.size()==0){
 	//					System.out.println("userSetsInOneItem.size()==0");
 	//				}
-					userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
+					tester.userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
 				}
 			}
 	
@@ -272,7 +272,7 @@ public class process {
 	//		kMeans2.printPoints();
 	//		kMeans2.printClusters();
 	//		kMeans2.printBelongs();
-	//		System.out.println(unRUL.toString());
+			System.out.println(unRUL.toString());
 			
 	//		System.out.println();
 	//		System.out.println("sorted");
@@ -283,9 +283,9 @@ public class process {
 	//		}
 	//		tester.printUserSetInItems();
 	//		tester.writeUser("userClusted.txt");
-			tester.bulidSimUserSet(userSetInUserList, unRUL);
-			for(int i=0; i<simUserSetList.size(); i++){
-				simUserSetList.get(i).sortSimUser();
+			tester.bulidSimUserSet(tester.userSetInUserList, unRUL);
+			for(int i=0; i<tester.simUserSetList.size(); i++){
+				tester.simUserSetList.get(i).sortSimUser();
 				
 			}
 //			simUserSetList.get(163).printSimUser();
@@ -296,7 +296,7 @@ public class process {
 		
 			Prediction prediction = new Prediction();
 
-			double[] mae_rmse_cluster = prediction.cluserMean(originalMatrix, randomedMatrix, density, random, userNumber, itemNumber, unRUL, simUserSetList, userSetInItemList);
+			double[] mae_rmse_cluster = prediction.cluserMean(originalMatrix, randomedMatrix, density, random, userNumber, itemNumber, unRUL, tester.simUserSetList, tester.userSetInItemList);
 //			double[] mae_rmse_3method = prediction.runUIPCC(originalMatrix, randomedMatrix, density, 34);
 //			System.arraycopy(mae_rmse_3method, 0, mae_rmse_4method[count], 0, 3);
 //			System.arraycopy(mae_rmse_3method, 3, mae_rmse_4method[count], 4, 3);
