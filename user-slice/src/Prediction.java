@@ -16,15 +16,36 @@ import java.util.Vector;
 public class Prediction {	
 	public double[] cluserMean(float[][] originalMatrix, float[][] randomedMatrix,
 			float density, float random,int userNumber, int itemNumber, ArrayList<Integer> unreliableUserList, ArrayList<SimUserSet> simUserSetList, ArrayList<UserSetInItem> userSetInItemList){
+		
 		//outlier has been removed
 		randomedMatrix = removeOutlier(unreliableUserList,randomedMatrix);
 		float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
 //		System.out.println("Caculating begin: " + new Time(System.currentTimeMillis()));
-		
 		float[] umean = UtilityFunctions.getUMean(randomedMatrix);
 		float[] imean = UtilityFunctions.getUMean(randomedMatrixT);
-		
 		float[][] predictedMatrix = new float[randomedMatrix.length][randomedMatrix[0].length];
+		float[][] predictedMatrixIMean = new float[randomedMatrix.length][randomedMatrix[0].length];
+		for(int i=0; i<userNumber; i++){
+			for(int j=0; j<itemNumber; j++){
+				if(originalMatrix[i][j]==-1){  //no value in originalMatrix
+					predictedMatrixIMean[i][j]=-1;
+					continue;
+				}
+				else if(randomedMatrix[i][j]==-3||randomedMatrix[i][j]==-2){
+					predictedMatrixIMean[i][j]=imean[j];
+				}
+				else{
+					predictedMatrixIMean[i][j]=randomedMatrix[i][j];
+				}
+				
+				
+			}
+		}
+		double maeIPCC=MAE(originalMatrix, randomedMatrix, predictedMatrixIMean);
+//		double rmseIPCC=RMSE(originalMatrix, randomedMatrix, predictedMatrixIMean);
+		UtilityFunctions.writeMatrix(predictedMatrixIMean, "RMSEResult/predicted/d"+density+"r"+random+"imeanbefore.txt");
+
+		
 		for(int i=0; i<userNumber; i++){
 			SimUserSet aSimUserSet = simUserSetList.get(i);
 			for(int j=0; j<itemNumber; j++){
@@ -42,7 +63,7 @@ public class Prediction {
 				}
 			
 				else if(randomedMatrix[i][j]==-3){ //outlier
-					predictedMatrix[i][j] = -3;
+					predictedMatrix[i][j] = imean[j];
 					continue;
 				}
 				
@@ -55,6 +76,8 @@ public class Prediction {
 						if(userNoInItem.contains(aSimUser.getUserNo())){ //simuser invoke the item
 							
 							UserSet aUserSet = aUserSetInItem.getUserSet(aSimUser.getUserNo());
+
+							
 							ArrayList<Integer> clustedUserNoList = aUserSet.getUserNoList();
 							float clusterMean=0;
 							int simUserInAClusterCount=0;
@@ -64,13 +87,14 @@ public class Prediction {
 									simUserInAClusterCount++;
 								}
 							}
-							if(simUserInAClusterCount==0){
-								System.out.println("simUserInAClusterCount==0");
-							}
 							if(simUserInAClusterCount!=0){
 								simUserClusterCount++;
 								simFlag=1;
 								allClusterMean+=clusterMean/simUserInAClusterCount; //get the cluster Mean of the cluster
+								if(j==0){
+									System.out.println("i="+i+" j ="+j+ " u= "+u+" "+aUserSet.toString()+" allclustermean="+clusterMean/simUserInAClusterCount);
+									
+								}
 							}
 						}
 						
@@ -83,7 +107,10 @@ public class Prediction {
 							predictedMatrix[i][j] = allClusterMean/simUserClusterCount;
 						}
 					}
-					if(simUserClusterCount==0) predictedMatrix[i][j] = umean[i]; //no simUser, use UMEAN
+					if(simUserClusterCount==0){
+//						System.out.println("i="+i+" j ="+j+" "+umean[i]);
+						predictedMatrix[i][j] = umean[i]; //no simUser, use UMEAN
+					}
 					continue;
 				}
 				else{
@@ -96,12 +123,14 @@ public class Prediction {
 		double mae=0;
 		double allnmae=0;
 		double nmae=0;
+		double rmse=0;
 		mae=MAE(originalMatrix, randomedMatrix, predictedMatrix);
-		allnmae = allNMAE(originalMatrix, randomedMatrix, predictedMatrix);
+//		rmse = RMSE(originalMatrix, randomedMatrix, predictedMatrix);
+//		allnmae = allNMAE(originalMatrix, randomedMatrix, predictedMatrix);
 //		nmae=NMAE(mae,allnmae);
 		mae_rmse_cluster[0] = mae;
 //		mae_rmse_cluster[1] = nmae;
-		mae_rmse_cluster[1] = RMSE(originalMatrix, randomedMatrix, predictedMatrix);
+		mae_rmse_cluster[1] = maeIPCC;
 //		System.out.println("MAE=" + mae_rmse_cluster[0]);
 //		System.out.println("RMSE=" + mae_rmse_cluster[1]);
 		UtilityFunctions.writeMatrix(predictedMatrix, "RMSEResult/predicted/d"+density+"r"+random+"Cluster.txt");
@@ -126,7 +155,8 @@ public class Prediction {
 		double number = 0;
 		for (int i = 0; i < originalMatrix.length; i++) {
 			for (int j = 0; j < originalMatrix[0].length; j++) {
-				if(randomedMatrix[i][j] == -2 && originalMatrix[i][j] != -1 && predictedMatrix[i][j] != -3) {
+//				if(randomedMatrix[i][j] == -2 && originalMatrix[i][j] != -1 && predictedMatrix[i][j] != -3) {
+				if(randomedMatrix[i][j] == -2 && originalMatrix[i][j] != -1) {
 					allMAE += Math.abs(predictedMatrix[i][j] - originalMatrix[i][j]);
 					number ++;
 				}
@@ -141,7 +171,8 @@ public class Prediction {
 		double number = 0;
 		for (int i = 0; i < originalMatrix.length; i++) {
 			for (int j = 0; j < originalMatrix[0].length; j++) {
-				if(randomedMatrix[i][j] == -2 && originalMatrix[i][j] != -1 && predictedMatrix[i][j] != -3) {
+				if(randomedMatrix[i][j] == -2 && originalMatrix[i][j] != -1) {
+//				if(randomedMatrix[i][j] == -2 && originalMatrix[i][j] != -1 && predictedMatrix[i][j] != -3) {
 					float f =(predictedMatrix[i][j] - originalMatrix[i][j])*(predictedMatrix[i][j] - originalMatrix[i][j]);
 					allRMSEMatrix[i][j] = f;
 					allRMSE += allRMSEMatrix[i][j];
