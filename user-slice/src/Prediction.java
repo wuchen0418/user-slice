@@ -17,14 +17,21 @@ public class Prediction {
 	public double[] cluserMean(float[][] originalMatrix, float[][] randomedMatrix,
 			float density, float random,int userNumber, int itemNumber, ArrayList<Integer> unreliableUserList, ArrayList<SimUserSet> simUserSetList, ArrayList<UserSetInItem> userSetInItemList){
 		
+		float[][] randomedMatrixBefore= new float[randomedMatrix.length][randomedMatrix[0].length];
+		UtilityFunctions.copyMatrix(randomedMatrix, randomedMatrixBefore);
 		//outlier has been removed
 		randomedMatrix = removeOutlier(unreliableUserList,randomedMatrix);
+		
 		float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
+		float[][] randomedMatrixBeforeT = UtilityFunctions.matrixTransfer(randomedMatrixBefore);
+		
 //		System.out.println("Caculating begin: " + new Time(System.currentTimeMillis()));
 		float[] umean = UtilityFunctions.getUMean(randomedMatrix);
 		float[] imean = UtilityFunctions.getUMean(randomedMatrixT);
+		float[] imeanbefore = UtilityFunctions.getUMean(randomedMatrixBeforeT);
 		float[][] predictedMatrix = new float[randomedMatrix.length][randomedMatrix[0].length];
 		float[][] predictedMatrixIMean = new float[randomedMatrix.length][randomedMatrix[0].length];
+		float[][] predictedMatrixIMeanBefore = new float[randomedMatrix.length][randomedMatrix[0].length];
 		for(int i=0; i<userNumber; i++){
 			for(int j=0; j<itemNumber; j++){
 				if(originalMatrix[i][j]==-1){  //no value in originalMatrix
@@ -41,12 +48,32 @@ public class Prediction {
 				
 			}
 		}
-		double maeIPCC=MAE(originalMatrix, randomedMatrix, predictedMatrixIMean);
-//		double rmseIPCC=RMSE(originalMatrix, randomedMatrix, predictedMatrixIMean);
-		UtilityFunctions.writeMatrix(predictedMatrixIMean, "RMSEResult/predicted/d"+density+"r"+random+"imeanbefore.txt");
-
 		
 		for(int i=0; i<userNumber; i++){
+			for(int j=0; j<itemNumber; j++){
+				if(originalMatrix[i][j]==-1){  //no value in originalMatrix
+					predictedMatrixIMeanBefore[i][j]=-1;
+					continue;
+				}
+				else if(randomedMatrixBefore[i][j]==-2){
+					predictedMatrixIMeanBefore[i][j]=imeanbefore[j];
+				}
+				else{
+					predictedMatrixIMeanBefore[i][j]=randomedMatrixBefore[i][j];
+				}
+				
+				
+			}
+		}
+//		double maeIPCC=MAE(originalMatrix, randomedMatrix, predictedMatrixIMean);
+		double rmseIPCC=RMSE(originalMatrix, randomedMatrix, predictedMatrixIMean);
+//		double maeIPCCbefore=MAE(originalMatrix, randomedMatrixBefore, predictedMatrixIMeanBefore);
+//		double rmseIPCCbefore=RMSE(originalMatrix, randomedMatrixBefore, predictedMatrixIMeanBefore);
+//		double rmseIPCC=RMSE(originalMatrix, randomedMatrix, predictedMatrixIMean);
+//		UtilityFunctions.writeMatrix(predictedMatrixIMean, "RMSEResult/predicted/d"+density+"r"+random+"imeanbefore.txt");
+
+		
+/*		for(int i=0; i<userNumber; i++){
 			SimUserSet aSimUserSet = simUserSetList.get(i);
 			for(int j=0; j<itemNumber; j++){
 				ArrayList<Integer> userNoInItem = new ArrayList<Integer>(); //get the users who invoke the service
@@ -117,23 +144,23 @@ public class Prediction {
 					predictedMatrix[i][j]=randomedMatrix[i][j];
 				}
 			}
-		}
+		}*/
 //		System.out.println("Caculating end: " + new Time(System.currentTimeMillis()));
 		double mae_rmse_cluster[] = new double[2];
 		double mae=0;
 		double allnmae=0;
 		double nmae=0;
 		double rmse=0;
-		mae=MAE(originalMatrix, randomedMatrix, predictedMatrix);
+//		mae=MAE(originalMatrix, randomedMatrix, predictedMatrix);
 //		rmse = RMSE(originalMatrix, randomedMatrix, predictedMatrix);
 //		allnmae = allNMAE(originalMatrix, randomedMatrix, predictedMatrix);
 //		nmae=NMAE(mae,allnmae);
-		mae_rmse_cluster[0] = mae;
+		mae_rmse_cluster[0] = rmseIPCC;
 //		mae_rmse_cluster[1] = nmae;
-		mae_rmse_cluster[1] = maeIPCC;
+//		mae_rmse_cluster[1] = rmseIPCCbefore;
 //		System.out.println("MAE=" + mae_rmse_cluster[0]);
 //		System.out.println("RMSE=" + mae_rmse_cluster[1]);
-		UtilityFunctions.writeMatrix(predictedMatrix, "RMSEResult/predicted/d"+density+"r"+random+"Cluster.txt");
+//		UtilityFunctions.writeMatrix(predictedMatrix, "RMSEResult/predicted/d"+density+"r"+random+"Cluster.txt");
 		
 		return mae_rmse_cluster;
 	}

@@ -176,7 +176,7 @@ public class process {
 	
 	public static void main(String[] args) {
 		double mae_rmse_4method[][] = new double[21][8];
-		int loopNum = 1;
+		int loopNum = 5;
 		for(int count=0; count<loopNum; count++){
 			String prefix = "WSDream-QoSDataset2/";
 			String matrix = "rtMatrix";
@@ -184,7 +184,7 @@ public class process {
 			tester.preProcess();
 			int userNumber = 339; 
 			int itemNumber = 5825;
-			int K=7;
+			int K=6;
 			float[][] randomedMatrix;
 			float[] itemRtList;
 			ArrayList<Integer> unreliableUser = new ArrayList<Integer>();
