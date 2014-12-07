@@ -637,7 +637,7 @@ public class UtilityFunctions {
 		return mae/allNMAE;
 	}
 	
-	public static double RMSE(float[][] originalMatrix, float[][] removedMatrix, float[][] predictedMatrix, String fileName){
+	public static double RMSE(float[][] originalMatrix, float[][] removedMatrix, float[][] predictedMatrix){
 		double allRMSE = 0;
 		double number = 0;
 		

@@ -47,9 +47,11 @@ public class Prediction {
 					predictedMatrix[i][j] = imean[j];
 					continue;
 				}
+
 				
-				else if(randomedMatrix[i][j]==-2){
-					int topK=4;
+				//original
+/*				else if(randomedMatrix[i][j]==-2){
+					int topK=3;
 					int simUserClusterCount=0;
 					float allClusterMean=0;
 					for(int u=0;u<aSimUserSet.getSimUserList().size();u++){
@@ -90,6 +92,83 @@ public class Prediction {
 					}
 					continue;
 				}
+				*/
+				
+////weighted
+			else if(randomedMatrix[i][j]==-2){
+				int topK=7;
+				int simUserClusterCount=0;
+				float allClusterMean=0;
+				int allWeight=0;
+				for(int u=0;u<aSimUserSet.getSimUserList().size();u++){
+					SimUser aSimUser = aSimUserSet.getSimUser(u);
+					int aSimUserNo = aSimUser.getUserNo();
+					int aSimUserWeight = aSimUser.getCount();
+					
+					if(userNoInItem.contains(aSimUserNo)){ //simuser invoke the item
+						allWeight+=aSimUserWeight;
+						UserSet aUserSet = aUserSetInItem.getUserSet(aSimUser.getUserNo());
+
+						
+						ArrayList<Integer> clustedUserNoList = aUserSet.getUserNoList();
+						float clusterMean=0;
+						int simUserInAClusterCount=0;
+						for(int a=0; a<clustedUserNoList.size(); a++){
+							if(!unreliableUserList.contains(clustedUserNoList.get(a))){
+								clusterMean += randomedMatrix[clustedUserNoList.get(a)][j];
+								simUserInAClusterCount++;
+							}
+						}
+						if(simUserInAClusterCount!=0){
+							simUserClusterCount++;
+							simFlag=1;
+							allClusterMean+=aSimUserWeight*(clusterMean/simUserInAClusterCount); //get the cluster Mean of the cluster
+						}
+					}
+					
+					if(simUserClusterCount==topK){
+						predictedMatrix[i][j] = allClusterMean/allWeight;
+						break;
+					}
+					
+					if(u==aSimUserSet.getSimUserList().size()-1&&simUserClusterCount<topK&&simUserClusterCount!=0){
+						predictedMatrix[i][j] = allClusterMean/allWeight;
+					}
+				}
+				if(simUserClusterCount==0){
+//					System.out.println("i="+i+" j ="+j+" "+umean[i]);
+					predictedMatrix[i][j] = umean[i]; //no simUser, use UMEAN
+				}
+				continue;
+			}
+				
+/*				else if(randomedMatrix[i][j]==-2){
+					int topK=3;
+					int simUserCount=0;
+					float allSimUserMean=0;
+					for(int u=0;u<aSimUserSet.getSimUserList().size();u++){
+						SimUser aSimUser = aSimUserSet.getSimUser(u);
+						int aSimUserNo = aSimUser.getUserNo();
+						if(userNoInItem.contains(aSimUserNo)&&!unreliableUserList.contains(aSimUserNo)){ //simuser invoke the item
+							allSimUserMean += randomedMatrix[aSimUserNo][j];
+							simUserCount++;
+						}
+						if(simUserCount==topK){
+							predictedMatrix[i][j] = allSimUserMean/topK;
+							break;
+						}
+						
+						if(u==aSimUserSet.getSimUserList().size()-1&&simUserCount<topK&&simUserCount!=0){
+							predictedMatrix[i][j] = allSimUserMean/simUserCount;
+						}
+					}
+					if(simUserCount==0){
+//						System.out.println("i="+i+" j ="+j+" "+umean[i]);
+						predictedMatrix[i][j] = umean[i]; //no simUser, use UMEAN
+					}
+					continue;
+				}*/
+				
 				else{
 					predictedMatrix[i][j]=randomedMatrix[i][j];
 				}
@@ -193,8 +272,8 @@ public class Prediction {
 		float[][] predictedMatrixUPCC = UPCC(originalMatrix, randomedMatrix, umean, topK);
 		float[][] predictedMatrixIPCC = IPCC(originalMatrix, randomedMatrix, imean, topK);
 		
-		UtilityFunctions.writeMatrix(predictedMatrixUPCC, "RMSEResult/predicted/d"+density+"upcc.txt");
-		UtilityFunctions.writeMatrix(predictedMatrixIPCC, "RMSEResult/predicted/d"+density+"ipcc.txt");
+//		UtilityFunctions.writeMatrix(predictedMatrixUPCC, "RMSEResult/predicted/d"+density+"upcc.txt");
+//		UtilityFunctions.writeMatrix(predictedMatrixIPCC, "RMSEResult/predicted/d"+density+"ipcc.txt");
 		
 		float[][] predictedMatrixIPCCT = UtilityFunctions.matrixTransfer(predictedMatrixIPCC);
 		double mae_upcc = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixUPCC);
@@ -204,8 +283,8 @@ public class Prediction {
 //		double nmae_upcc = UtilityFunctions.NMAE(mae_upcc,allNMAE);
 //		double nmae_ipcc = UtilityFunctions.NMAE(mae_ipcc,allNMAE);
 		
-		double rmse_upcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixUPCC, "RMSEResult/rmse_upcc.txt");
-		double rmse_ipcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixIPCC, "RMSEResult/rmse_ipcc.txt");
+		double rmse_upcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixUPCC);
+		double rmse_ipcc = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixIPCC);
 		mae_uipcc = new double[11]; 
 //		nmae_uipcc = new double[11]; 
 		rmse_uipcc = new double[11]; 
@@ -220,7 +299,7 @@ public class Prediction {
 //			nmae = UtilityFunctions.NMAE(mae,allNMAE);
 			mae_uipcc[i] =  mae;
 //			nmae_uipcc[i] =  nmae;
-			rmse_uipcc[i] = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC, "RMSEResult/rmse_uipcc_"+i+".txt");
+			rmse_uipcc[i] = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC);
 		}
 
 		double smallMAE = 100;
