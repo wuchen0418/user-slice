@@ -120,7 +120,7 @@ public class process {
 	}
 	
 	public void bulidSimUserSet (ArrayList<UserSetInUser> userList, ArrayList<Integer> unreliablelist){
-		for(int i=0; i<this.userNumber; i++){
+		for(int i=0; i<this.itemNumber; i++){
 			UserSetInUser aUser = userList.get(i);
 			SimUserSet newClustedUser;
 			//for outlier
@@ -176,7 +176,7 @@ public class process {
 	
 	public static void main(String[] args) {
 		double mae_rmse_4method[][] = new double[21][12];
-		int loopNum = 5;
+		int loopNum = 1;
 		for(int count=0; count<loopNum; count++){
 			String prefix = "WSDream-QoSDataset2/";
 			String matrix = "rtMatrix";
@@ -185,6 +185,7 @@ public class process {
 			int userNumber = 339; 
 			int itemNumber = 5825;
 			int K=7;
+			int K2=20;
 			float[][] randomedMatrix;
 			float[] itemRtList;
 			ArrayList<Integer> unreliableUser = new ArrayList<Integer>();
@@ -195,14 +196,47 @@ public class process {
 			float random = (float)0.03;
 			
 			randomedMatrix = UtilityFunctions.readMatrix("randomed/" + matrix + density + "_" + random, userNumber, itemNumber);
-			tester.buildUserSetInUserList(userNumber);
-			tester.buildUserSetInItemList(itemNumber);
+
 			
 			for(int itemNo=0; itemNo<itemNumber; itemNo++){			
-				ArrayList<UserSet> userSetsInOneItem = new ArrayList<UserSet>();
 				itemRtList=tester.getItemRtList(itemNo, randomedMatrix, userNumber);
 				if(tester.userGreaterK(itemRtList,K)){
 					KMeans kMeans = new KMeans(itemRtList,K);
+					kMeans.cluster();
+					if(kMeans.getClustersNum()!=0){
+						unreliableUser = kMeans.getUnreliableUserList();
+	//					if(unreliableUser.size()>0){
+							for(int i=0; i<unreliableUser.size();i++){
+								int userNo = unreliableUser.get(i);
+								userCount[userNo]++;
+							}
+	//						System.out.println(unreliableUser.toString());
+							unreliableUser.clear();
+	//					}
+					}
+				}
+			}
+	
+			KMeans kMeans2 = new KMeans(userCount);
+			kMeans2.cluster();
+			ArrayList<Integer> unRUL=kMeans2.getUnreliableUserList();
+	//		kMeans2.printPoints();
+	//		kMeans2.printClusters();
+	//		kMeans2.printBelongs();
+			System.out.println(unRUL.toString());
+			
+			int userNumberT = 5825; 
+			int itemNumberT = 339;
+			
+			float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
+			tester.buildUserSetInUserList(userNumberT);
+			tester.buildUserSetInItemList(itemNumberT);
+			
+			for(int itemNo=0; itemNo<itemNumberT; itemNo++){			
+				ArrayList<UserSet> userSetsInOneItem = new ArrayList<UserSet>();
+				itemRtList=tester.getItemRtList(itemNo, randomedMatrixT, userNumberT);
+				if(tester.userGreaterK(itemRtList,K2)){
+					KMeans kMeans = new KMeans(itemRtList,K2);
 					kMeans.cluster();
 					userSetsInOneItem = kMeans.buildUserSet(itemNo);
 					
@@ -217,20 +251,7 @@ public class process {
 							temUser.addUserSetInUserList(aUserSet);
 							tester.userSetInUserList.set(userno, temUser);
 						}
-					}
-
-					if(kMeans.getClustersNum()!=0){
-						unreliableUser = kMeans.getUnreliableUserList();
-	//					if(unreliableUser.size()>0){
-							for(int i=0; i<unreliableUser.size();i++){
-								int userNo = unreliableUser.get(i);
-								userCount[userNo]++;
-							}
-	//						System.out.println(unreliableUser.toString());
-							unreliableUser.clear();
-	//					}
-					}
-		
+					}		
 				}
 				else{
 					int c=0;
@@ -251,14 +272,6 @@ public class process {
 					tester.userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
 				}
 			}
-	
-			KMeans kMeans2 = new KMeans(userCount);
-			kMeans2.cluster();
-			ArrayList<Integer> unRUL=kMeans2.getUnreliableUserList();
-	//		kMeans2.printPoints();
-	//		kMeans2.printClusters();
-	//		kMeans2.printBelongs();
-			System.out.println(unRUL.toString());
 			
 	//		System.out.println();
 	//		System.out.println("sorted");
@@ -277,14 +290,17 @@ public class process {
 //			simUserSetList.get(163).printSimUser();
 	//		tester.printclustedUserList();
 			
-			float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", userNumber, itemNumber);		
+			float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", userNumber, itemNumber);
+			float[][] originalMatrixT = UtilityFunctions.matrixTransfer(originalMatrix);
+			
+			
 			Prediction prediction = new Prediction();
-			Predictor predictor = new Predictor();
+//			Predictor predictor = new Predictor();
 
-			double[] mae_rmse_cluster = prediction.cluserMean(originalMatrix, randomedMatrix, density, random, userNumber, itemNumber, unRUL, tester.simUserSetList, tester.userSetInItemList);
+			double[] mae_rmse_cluster = prediction.cluserMean(originalMatrixT, randomedMatrixT, density, random, userNumberT, itemNumberT, unRUL, tester.simUserSetList, tester.userSetInItemList);
 //			double[] mae_rmse_3method = prediction.runUIPCC(originalMatrix, randomedMatrix, density, 34);
 //			double[][] mae_rmse_rap = predictor.run8Methods(originalMatrix, randomedMatrix, random, 34, density, (float)0.1);
-			double mae_rmse_rap2[] = new double[4];
+//			double mae_rmse_rap2[] = new double[4];
 			
 //			mae_rmse_rap2[0] = mae_rmse_rap[0][0];
 //			mae_rmse_rap2[1] = mae_rmse_rap[0][1];
@@ -295,8 +311,8 @@ public class process {
 //			System.arraycopy(mae_rmse_3method, 3, mae_rmse_4method[count], 4, 3);
 			System.arraycopy(mae_rmse_cluster, 0, mae_rmse_4method[count], 3, 1);
 			System.arraycopy(mae_rmse_cluster, 1, mae_rmse_4method[count], 7, 1);
-			System.arraycopy(mae_rmse_rap2, 0, mae_rmse_4method[count], 8, 2);
-			System.arraycopy(mae_rmse_rap2, 2, mae_rmse_4method[count], 10, 2);
+//			System.arraycopy(mae_rmse_rap2, 0, mae_rmse_4method[count], 8, 2);
+//			System.arraycopy(mae_rmse_rap2, 2, mae_rmse_4method[count], 10, 2);
 			
 			System.out.println(count+": "+"mae__rmse_4method = \t"+mae_rmse_4method[count][0]+"\t"+mae_rmse_4method[count][1]+"\t"+mae_rmse_4method[count][2]+"\t"+mae_rmse_4method[count][3]
 					+"\t"+mae_rmse_4method[count][4]+"\t"+mae_rmse_4method[count][5]+"\t"+mae_rmse_4method[count][6]+"\t"+mae_rmse_4method[count][7]+"\t"+mae_rmse_4method[count][8]+"\t"+mae_rmse_4method[count][9]+"\t"+mae_rmse_4method[count][10]+"\t"+mae_rmse_4method[count][11]);

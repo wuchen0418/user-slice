@@ -44,13 +44,13 @@ public class Prediction {
 				}
 			
 				else if(randomedMatrix[i][j]==-3){ //outlier
-					predictedMatrix[i][j] = imean[j];
+					predictedMatrix[i][j] = umean[j];
 					continue;
 				}
 
 				
 				//original
-/*				else if(randomedMatrix[i][j]==-2){
+				else if(randomedMatrix[i][j]==-2){
 					int topK=3;
 					int simUserClusterCount=0;
 					float allClusterMean=0;
@@ -92,8 +92,8 @@ public class Prediction {
 					}
 					continue;
 				}
-				*/
-				
+
+/*				
 ////weighted
 			else if(randomedMatrix[i][j]==-2){
 				int topK=7;
@@ -141,6 +141,7 @@ public class Prediction {
 				}
 				continue;
 			}
+				*/
 				
 /*				else if(randomedMatrix[i][j]==-2){
 					int topK=3;
@@ -201,7 +202,7 @@ public class Prediction {
 		for(int i=0; i<unreliableUserList.size(); i++){
 			int userno=unreliableUserList.get(i);
 			for(int j=0; j<resultMatrix[userno].length;j++)
-				resultMatrix[userno][j]=-3; // outlier
+				resultMatrix[j][userno]=-3; // outlier
 		}
 		return resultMatrix;
 	}
