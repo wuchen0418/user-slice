@@ -50,7 +50,7 @@ public class Prediction {
 
 				
 				//original
-/*				else if(randomedMatrix[i][j]==-2){
+				else if(randomedMatrix[i][j]==-2){
 					int topK=3;
 					int simUserClusterCount=0;
 					float allClusterMean=0;
@@ -87,13 +87,13 @@ public class Prediction {
 						}
 					}
 					if(simUserClusterCount==0){
-//						System.out.println("i="+i+" j ="+j+" "+umean[i]);
+						System.out.println("i="+i+" j ="+j+" "+umean[i]);
 						predictedMatrix[i][j] = umean[i]; //no simUser, use UMEAN
 					}
 					continue;
 				}
-				*/
-				
+
+/*				
 ////weighted
 			else if(randomedMatrix[i][j]==-2){
 				int topK=7;
@@ -141,7 +141,7 @@ public class Prediction {
 				}
 				continue;
 			}
-				
+				*/
 /*				else if(randomedMatrix[i][j]==-2){
 					int topK=3;
 					int simUserCount=0;

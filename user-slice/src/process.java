@@ -279,7 +279,7 @@ public class process {
 			
 			float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", userNumber, itemNumber);		
 			Prediction prediction = new Prediction();
-			Predictor predictor = new Predictor();
+//			Predictor predictor = new Predictor();
 
 			double[] mae_rmse_cluster = prediction.cluserMean(originalMatrix, randomedMatrix, density, random, userNumber, itemNumber, unRUL, tester.simUserSetList, tester.userSetInItemList);
 //			double[] mae_rmse_3method = prediction.runUIPCC(originalMatrix, randomedMatrix, density, 34);
