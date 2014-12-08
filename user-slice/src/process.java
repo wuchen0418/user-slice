@@ -185,7 +185,7 @@ public class process {
 			int userNumber = 339; 
 			int itemNumber = 5825;
 			int K=7;
-			int K2=30;
+			int K2=5;
 			float[][] randomedMatrix;
 			float[] itemRtList;
 			ArrayList<Integer> unreliableUser = new ArrayList<Integer>();
