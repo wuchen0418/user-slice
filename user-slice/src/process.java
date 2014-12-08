@@ -185,7 +185,7 @@ public class process {
 			int userNumber = 339; 
 			int itemNumber = 5825;
 			int K=7;
-			int K2=5;
+			int K2=12;
 			float[][] randomedMatrix;
 			float[] itemRtList;
 			ArrayList<Integer> unreliableUser = new ArrayList<Integer>();
@@ -282,7 +282,8 @@ public class process {
 	//		}
 	//		tester.printUserSetInItems();
 	//		tester.writeUser("userClusted.txt");
-			tester.bulidSimUserSet(tester.userSetInUserList, unRUL);
+			ArrayList<Integer> unRUL2=new ArrayList<Integer>();
+			tester.bulidSimUserSet(tester.userSetInUserList, unRUL2);
 			for(int i=0; i<tester.simUserSetList.size(); i++){
 				tester.simUserSetList.get(i).sortSimUser();
 				
