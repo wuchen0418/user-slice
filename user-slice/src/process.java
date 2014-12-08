@@ -185,7 +185,7 @@ public class process {
 			int userNumber = 339; 
 			int itemNumber = 5825;
 			int K=7;
-			int K2=20;
+			int K2=30;
 			float[][] randomedMatrix;
 			float[] itemRtList;
 			ArrayList<Integer> unreliableUser = new ArrayList<Integer>();
@@ -236,9 +236,9 @@ public class process {
 				ArrayList<UserSet> userSetsInOneItem = new ArrayList<UserSet>();
 				itemRtList=tester.getItemRtList(itemNo, randomedMatrixT, userNumberT);
 				if(tester.userGreaterK(itemRtList,K2)){
-					KMeans kMeans = new KMeans(itemRtList,K2);
-					kMeans.cluster();
-					userSetsInOneItem = kMeans.buildUserSet(itemNo);
+					KMeans kMeans3 = new KMeans(itemRtList,K2);
+					kMeans3.cluster();
+					userSetsInOneItem = kMeans3.buildUserSet(itemNo);
 					
 					tester.userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));				
 					for(int i=0; i<userSetsInOneItem.size(); i++){
