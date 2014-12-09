@@ -195,11 +195,11 @@ public class process {
 						
 			float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", userNumber, itemNumber);		
 			Prediction prediction = new Prediction();
-//			Predictor predictor = new Predictor();
+			Predictor predictor = new Predictor();
 			double[] mae_rmse_cluster = prediction.runUICluster(originalMatrix, randomedMatrix, density, random, userNumber, itemNumber, K1, K2);
 			
 //			double[] mae_rmse_3method = prediction.runUIPCC(originalMatrix, randomedMatrix, density, 34);
-//			double[][] mae_rmse_rap = predictor.run8Methods(originalMatrix, randomedMatrix, random, 34, density, (float)0.1);
+			double[][] mae_rmse_rap = predictor.run8Methods(originalMatrix, randomedMatrix, random, 34, density, (float)0.1);
 //			double mae_rmse_rap2[] = new double[4];
 			
 //			mae_rmse_rap2[0] = mae_rmse_rap[0][0];

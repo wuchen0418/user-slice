@@ -19,7 +19,7 @@ public class Predictor {
 	float[] URR_Cluster_AVG;
 	//float[] URR_imean;
 	//float[] URR_umean;
-	ArrayList unreliableUserList;
+	ArrayList<Integer> unreliableUserList;
 	HashMap userLocationMap; 
 	Vector<String> country = new Vector<String>();
 
@@ -1097,7 +1097,7 @@ public class Predictor {
 	
 	public void getUnreliableUserList(float[] URR) {
 		//Test if the URR algorithm can identify unreliable users. (Yes)
-		KMeans kMeans = new KMeans(URR);
+		KMeans kMeans = new KMeans(URR,2);
 		kMeans.cluster();
 		unreliableUserList=kMeans.getUnreliableUserList();
 	}
