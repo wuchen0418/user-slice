@@ -176,7 +176,7 @@ public class process {
 	
 	public static void main(String[] args) {
 		double mae_rmse_4method[][] = new double[21][12];
-		int loopNum = 5;
+		int loopNum = 20;
 		for(int count=0; count<loopNum; count++){
 			String prefix = "WSDream-QoSDataset2/";
 			String matrix = "rtMatrix";
@@ -184,7 +184,8 @@ public class process {
 			tester.preProcess();
 			int userNumber = 339; 
 			int itemNumber = 5825;
-			int K=7;
+			int K1=7;
+			int K2 = 12;
 			float[][] randomedMatrix;
 			float[] itemRtList;
 			ArrayList<Integer> unreliableUser = new ArrayList<Integer>();
@@ -195,10 +196,10 @@ public class process {
 			float random = (float)0.03;
 			
 			randomedMatrix = UtilityFunctions.readMatrix("randomed/" + matrix + density + "_" + random, userNumber, itemNumber);
-			tester.buildUserSetInUserList(userNumber);
-			tester.buildUserSetInItemList(itemNumber);
+//			tester.buildUserSetInUserList(userNumber);
+//			tester.buildUserSetInItemList(itemNumber);
 			
-			for(int itemNo=0; itemNo<itemNumber; itemNo++){			
+/*			for(int itemNo=0; itemNo<itemNumber; itemNo++){			
 				ArrayList<UserSet> userSetsInOneItem = new ArrayList<UserSet>();
 				itemRtList=tester.getItemRtList(itemNo, randomedMatrix, userNumber);
 				if(tester.userGreaterK(itemRtList,K)){
@@ -250,15 +251,15 @@ public class process {
 					}
 					tester.userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
 				}
-			}
+			}*/
 	
-			KMeans kMeans2 = new KMeans(userCount);
+/*			KMeans kMeans2 = new KMeans(userCount);
 			kMeans2.cluster();
 			ArrayList<Integer> unRUL=kMeans2.getUnreliableUserList();
 	//		kMeans2.printPoints();
 	//		kMeans2.printClusters();
 	//		kMeans2.printBelongs();
-			System.out.println(unRUL.toString());
+			System.out.println(unRUL.toString());*/
 			
 	//		System.out.println();
 	//		System.out.println("sorted");
@@ -269,11 +270,11 @@ public class process {
 	//		}
 	//		tester.printUserSetInItems();
 	//		tester.writeUser("userClusted.txt");
-			tester.bulidSimUserSet(tester.userSetInUserList, unRUL);
+/*			tester.bulidSimUserSet(tester.userSetInUserList, unRUL);
 			for(int i=0; i<tester.simUserSetList.size(); i++){
 				tester.simUserSetList.get(i).sortSimUser();
 				
-			}
+			}*/
 //			simUserSetList.get(163).printSimUser();
 	//		tester.printclustedUserList();
 			
@@ -281,10 +282,13 @@ public class process {
 			Prediction prediction = new Prediction();
 //			Predictor predictor = new Predictor();
 
-			double[] mae_rmse_cluster = prediction.cluserMean(originalMatrix, randomedMatrix, density, random, userNumber, itemNumber, unRUL, tester.simUserSetList, tester.userSetInItemList);
+//			double[] mae_rmse_cluster = prediction.cluserMean(originalMatrix, randomedMatrix, density, random, userNumber, itemNumber, unRUL, tester.simUserSetList, tester.userSetInItemList);
+			double[] mae_rmse_cluster = prediction.runUICluster(originalMatrix, randomedMatrix, density, random, userNumber, itemNumber, K1, K2);
+			
+			
 //			double[] mae_rmse_3method = prediction.runUIPCC(originalMatrix, randomedMatrix, density, 34);
 //			double[][] mae_rmse_rap = predictor.run8Methods(originalMatrix, randomedMatrix, random, 34, density, (float)0.1);
-			double mae_rmse_rap2[] = new double[4];
+//			double mae_rmse_rap2[] = new double[4];
 			
 //			mae_rmse_rap2[0] = mae_rmse_rap[0][0];
 //			mae_rmse_rap2[1] = mae_rmse_rap[0][1];
@@ -293,13 +297,14 @@ public class process {
 //			
 //			System.arraycopy(mae_rmse_3method, 0, mae_rmse_4method[count], 0, 3);
 //			System.arraycopy(mae_rmse_3method, 3, mae_rmse_4method[count], 4, 3);
-			System.arraycopy(mae_rmse_cluster, 0, mae_rmse_4method[count], 3, 1);
-			System.arraycopy(mae_rmse_cluster, 1, mae_rmse_4method[count], 7, 1);
-			System.arraycopy(mae_rmse_rap2, 0, mae_rmse_4method[count], 8, 2);
-			System.arraycopy(mae_rmse_rap2, 2, mae_rmse_4method[count], 10, 2);
+			System.arraycopy(mae_rmse_cluster, 0, mae_rmse_4method[count], 0, 3);
+			System.arraycopy(mae_rmse_cluster, 3, mae_rmse_4method[count], 3, 3);
+//			System.arraycopy(mae_rmse_rap2, 0, mae_rmse_4method[count], 8, 2);
+//			System.arraycopy(mae_rmse_rap2, 2, mae_rmse_4method[count], 10, 2);
 			
-			System.out.println(count+": "+"mae__rmse_4method = \t"+mae_rmse_4method[count][0]+"\t"+mae_rmse_4method[count][1]+"\t"+mae_rmse_4method[count][2]+"\t"+mae_rmse_4method[count][3]
-					+"\t"+mae_rmse_4method[count][4]+"\t"+mae_rmse_4method[count][5]+"\t"+mae_rmse_4method[count][6]+"\t"+mae_rmse_4method[count][7]+"\t"+mae_rmse_4method[count][8]+"\t"+mae_rmse_4method[count][9]+"\t"+mae_rmse_4method[count][10]+"\t"+mae_rmse_4method[count][11]);
+			System.out.println(count+": "+"mae__rmse_4method = \t"+mae_rmse_4method[count][0]+"\t"
+			+mae_rmse_4method[count][1]+"\t"+mae_rmse_4method[count][2]+"\t"+mae_rmse_4method[count][3]
+					+"\t"+mae_rmse_4method[count][4]+"\t"+mae_rmse_4method[count][5]);
 		}
 		double mae_upcc_mean = 0;
 		double mae_ipcc_mean = 0;
@@ -319,18 +324,18 @@ public class process {
 			mae_upcc_mean += mae_rmse_4method[t][0];
 			mae_ipcc_mean += mae_rmse_4method[t][1];
 			mae_uipcc_mean += mae_rmse_4method[t][2];
-			mae_cluster_mean += mae_rmse_4method[t][3];
+//			mae_cluster_mean += mae_rmse_4method[t][3];
 			
-			rmse_upcc_mean += mae_rmse_4method[t][4];
-			rmse_ipcc_mean += mae_rmse_4method[t][5];
-			rmse_uipcc_mean += mae_rmse_4method[t][6];
-			rmse_cluster_mean += mae_rmse_4method[t][7];
+			rmse_upcc_mean += mae_rmse_4method[t][3];
+			rmse_ipcc_mean += mae_rmse_4method[t][4];
+			rmse_uipcc_mean += mae_rmse_4method[t][5];
+//			rmse_cluster_mean += mae_rmse_4method[t][7];
 			
-			mae_uipcc2_mean += mae_rmse_4method[t][8];
-			mae_rap_mean += mae_rmse_4method[t][10];
-			
-			rmse_uipcc2_mean += mae_rmse_4method[t][9];
-			rmse_rap_mean += mae_rmse_4method[t][11];
+//			mae_uipcc2_mean += mae_rmse_4method[t][8];
+//			mae_rap_mean += mae_rmse_4method[t][10];
+//			
+//			rmse_uipcc2_mean += mae_rmse_4method[t][9];
+//			rmse_rap_mean += mae_rmse_4method[t][11];
 		}
 		mae_upcc_mean = mae_upcc_mean/loopNum;
 		mae_ipcc_mean = mae_ipcc_mean/loopNum;
@@ -350,22 +355,23 @@ public class process {
 		mae_rmse_4method[20][0]=mae_upcc_mean;
 		mae_rmse_4method[20][1]=mae_ipcc_mean;
 		mae_rmse_4method[20][2]=mae_uipcc_mean;
-		mae_rmse_4method[20][3]=mae_cluster_mean;
+//		mae_rmse_4method[20][3]=mae_cluster_mean;
 		
-		mae_rmse_4method[20][4] = rmse_upcc_mean;
-		mae_rmse_4method[20][5] = rmse_ipcc_mean;
-		mae_rmse_4method[20][6] = rmse_uipcc_mean;
-		mae_rmse_4method[20][7] = rmse_cluster_mean;
+		mae_rmse_4method[20][3] = rmse_upcc_mean;
+		mae_rmse_4method[20][4] = rmse_ipcc_mean;
+		mae_rmse_4method[20][5] = rmse_uipcc_mean;
+//		mae_rmse_4method[20][7] = rmse_cluster_mean;
+//		
+//		mae_rmse_4method[20][8]=mae_uipcc2_mean;
+//		mae_rmse_4method[20][10]=mae_rap_mean;
+//		
+//		mae_rmse_4method[20][9] = rmse_uipcc2_mean;
+//		mae_rmse_4method[20][11] = rmse_rap_mean;
 		
-		mae_rmse_4method[20][8]=mae_uipcc2_mean;
-		mae_rmse_4method[20][10]=mae_rap_mean;
-		
-		mae_rmse_4method[20][9] = rmse_uipcc2_mean;
-		mae_rmse_4method[20][11] = rmse_rap_mean;
 		
 		
-		
-		System.out.println("mae__rmse_4method(mean) = \t"+mae_rmse_4method[20][0]+"\t"+mae_rmse_4method[20][1]+"\t"+mae_rmse_4method[20][2]+"\t"+mae_rmse_4method[20][3]
-				+"\t"+mae_rmse_4method[20][4]+"\t"+mae_rmse_4method[20][5]+"\t"+mae_rmse_4method[20][6]+"\t"+mae_rmse_4method[20][7]+"\t"+mae_rmse_4method[20][8]+"\t"+mae_rmse_4method[20][9]+"\t"+mae_rmse_4method[20][10]+"\t"+mae_rmse_4method[20][11]);
+		System.out.println("mae__rmse_4method(mean) = \t"+mae_rmse_4method[20][0]+"\t"
+		+mae_rmse_4method[20][1]+"\t"+mae_rmse_4method[20][2]+"\t"+mae_rmse_4method[20][3]
+				+"\t"+mae_rmse_4method[20][4]+"\t"+mae_rmse_4method[20][5]);
 	}
 }
