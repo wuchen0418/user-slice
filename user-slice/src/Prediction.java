@@ -19,61 +19,21 @@ public class Prediction {
 	public double[] runUICluster(float[][] originalMatrix, float[][] randomedMatrix,
 			float density, float random,int userNumber, int itemNumber, int K1, int K2){		
 		
-		double mae_rmse_3method[] = new double[6];	
-		float[][] originalMatrixT = UtilityFunctions.matrixTransfer(originalMatrix);
+		double mae_rmse_3method[] = new double[2];	
 		float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
 		
 		float[] umean = UtilityFunctions.getUMean(randomedMatrix);
 		float[] imean = UtilityFunctions.getUMean(randomedMatrixT);
 		
-		double[] mae_uicluster = new double[11]; 
-		double[] rmse_uicluster = new double[11];
-		
 		float[][] predictedMatrixUCluster = UserCluser(originalMatrix, randomedMatrix, umean, imean, K1);
-		float[][] predictedMatrixIClusterT = ServiceCluser(originalMatrixT, randomedMatrixT, imean,umean, K2);
-		
-//		UtilityFunctions.writeMatrix(predictedMatrixUCluster, "RMSEResult/predicted/d"+density+"ucluster.txt");
-//		UtilityFunctions.writeMatrix(predictedMatrixIPCC, "RMSEResult/predicted/d"+density+"ipcc.txt");
-		
-		float[][] predictedMatrixICluster = UtilityFunctions.matrixTransfer(predictedMatrixIClusterT);
-		double mae_ucluster = MAE(originalMatrix, randomedMatrix, predictedMatrixUCluster);
-		double mae_icluster = MAE(originalMatrix, randomedMatrix, predictedMatrixICluster);
 
-		double rmse_ucluster = RMSE(originalMatrix, randomedMatrix, predictedMatrixUCluster);
-		double rmse_icluster = RMSE(originalMatrix, randomedMatrix, predictedMatrixICluster);
-		
-		mae_uicluster = new double[11]; 
-		rmse_uicluster = new double[11]; 
-		for (int i = 0; i < 11; i++) {
-			double mae =0;
-			double nmae =0;
-			//对lambda值从0到1进行尝试，选择效果最好的作为最终结果
-			double lambda2 = (double)i/10.0;
-			float[][] predictedMatrixUICluster = UIPCC(predictedMatrixUCluster, predictedMatrixIClusterT, lambda2);
-			mae = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixUICluster);
-			mae_uicluster[i] =  mae;
-			rmse_uicluster[i] = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixUICluster);
-		}
-		
-		double smallMAE = 100;
-		double smallRMSE = 100;
-		for (int i = 0; i < 11; i++) {
-			if(mae_uicluster[i] < smallMAE) smallMAE = mae_uicluster[i];
-			if(rmse_uicluster[i] < smallRMSE){
-				smallRMSE = rmse_uicluster[i];
-				System.out.println(i + " is better");
-			}
-		}		
+		double mae_ucluster = MAE(originalMatrix, randomedMatrix, predictedMatrixUCluster);
+		double allnmae_ucluster = allNMAE(originalMatrix, randomedMatrix, predictedMatrixUCluster);
+		double nmae_ucluster = NMAE(mae_ucluster, allnmae_ucluster);
+
 		mae_rmse_3method[0] = mae_ucluster;
-		mae_rmse_3method[1] = mae_icluster;
-		mae_rmse_3method[2] = smallMAE;
-		
-		mae_rmse_3method[3] = rmse_ucluster;
-		mae_rmse_3method[4] = rmse_icluster;
-		mae_rmse_3method[5] = smallRMSE;
-		
+		mae_rmse_3method[1] = nmae_ucluster;	
 		return mae_rmse_3method;
-		
 	}
 	
 	public float[][] UserCluser(float[][] originalMatrix, float[][] randomedMatrix, float[] umean, float[] imean, int K){
@@ -161,8 +121,6 @@ public class Prediction {
 		//outlier has been removed
 		randomedMatrix = removeOutlierUser(unRUL,randomedMatrix);
 		
-//		float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
-		
 //		System.out.println("Caculating begin: " + new Time(System.currentTimeMillis()));
 		float[][] predictedMatrix = new float[randomedMatrix.length][randomedMatrix[0].length];
 
@@ -188,7 +146,7 @@ public class Prediction {
 				}
 				//original
 				else if(randomedMatrix[i][j]==-2){
-					int topK=3;
+					int topK=1;
 					int simUserClusterCount=0;
 					float allClusterMean=0;
 					for(int u=0;u<aSimUserSet.getSimUserList().size();u++){
@@ -239,157 +197,6 @@ public class Prediction {
 			}
 		}
 		return  predictedMatrix;
-		
-	}
-	
-	
-	
-	public float[][] ServiceCluser(float[][] originalMatrix, float[][] randomedMatrix, float[] umean, float[] imean, int K){
-		int userNumber = originalMatrix.length;
-		int itemNumber = originalMatrix[0].length;
-		float[] itemRtList;
-//		ArrayList<Integer> unreliableUser = new ArrayList<Integer>();
-//		int[] userCount=new int[userNumber];
-		
-		
-		ArrayList<UserSetInUser> userSetInUserList = new ArrayList<UserSetInUser>();
-		ArrayList<UserSetInItem> userSetInItemList = new ArrayList<UserSetInItem>();
-		ArrayList<SimUserSet> simUserSetList = new ArrayList<SimUserSet>();
-		
-		for(int i=0; i<userNumber; i++){
-			userSetInUserList.add(i, new UserSetInUser(i));
-		}
-		
-		for(int i=0; i<itemNumber; i++){
-			userSetInItemList.add(i, new UserSetInItem(i));
-		}
-		
-		
-		for(int itemNo=0; itemNo<itemNumber; itemNo++){			
-			ArrayList<UserSet> userSetsInOneItem = new ArrayList<UserSet>();
-			itemRtList=getItemRtList(itemNo, randomedMatrix, userNumber);
-			if(userGreaterK(itemRtList,K)){
-				KMeans kMeans = new KMeans(itemRtList,K);
-				kMeans.cluster();
-				userSetsInOneItem = kMeans.buildUserSet(itemNo);
-				
-				userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));				
-				for(int i=0; i<userSetsInOneItem.size(); i++){
-					UserSet aUserSet = userSetsInOneItem.get(i);
-					ArrayList<Integer> usersInUserSet = new ArrayList<Integer>(); //store the userno in userSet
-					usersInUserSet = aUserSet.getUserNoList();
-					for(int u=0; u<usersInUserSet.size(); u++){
-						int userno = usersInUserSet.get(u);
-						UserSetInUser temUser = userSetInUserList.get(userno);
-						temUser.addUserSetInUserList(aUserSet);
-						userSetInUserList.set(userno, temUser);
-					}
-				}	
-			}
-			else{
-				int c=0;
-				for(int t=0; t<itemRtList.length; t++){
-					float x = itemRtList[t];
-					if(x!=-2&&x!=-1){
-						UserSet aUserSet = new UserSet(itemNo,c);
-						aUserSet.addUser(t);
-						userSetsInOneItem.add(aUserSet);
-						c++;
-						
-						UserSetInUser temUser = userSetInUserList.get(t);
-						temUser.addUserSetInUserList(aUserSet);
-						userSetInUserList.set(t, temUser);
-						
-					}
-				}
-				userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
-			}
-		}
-		simUserSetList = bulidSimUserSet(userSetInUserList, new ArrayList<Integer> (), userNumber);
-		for(int i=0; i<simUserSetList.size(); i++){
-			simUserSetList.get(i).sortSimUser();
-		}
-		//outlier has been removed
-		randomedMatrix = removeOutlierItem(unRUL,randomedMatrix);
-		
-//		System.out.println("Caculating begin: " + new Time(System.currentTimeMillis()));
-		float[][] predictedMatrix = new float[randomedMatrix.length][randomedMatrix[0].length];
-
-		for(int i=0; i<userNumber; i++){
-			SimUserSet aSimUserSet = simUserSetList.get(i);
-			for(int j=0; j<itemNumber; j++){
-				ArrayList<Integer> userNoInItem = new ArrayList<Integer>(); //get the users who invoke the service
-				for(int index=0;index<userNumber;index++){
-					if(randomedMatrix[index][j]!=-1&&randomedMatrix[index][j]!=-2&&randomedMatrix[index][j]!=-3){
-						userNoInItem.add(index);
-					}
-				}
-				UserSetInItem aUserSetInItem = userSetInItemList.get(j); //get userSets in item j 
-				int simFlag =0; //flag for simuser
-				if(originalMatrix[i][j]==-1){  //no value in originalMatrix
-					predictedMatrix[i][j]=-1;
-					continue;
-				}
-			
-				else if(randomedMatrix[i][j]==-3){ //outlier
-					predictedMatrix[i][j] = umean[i];
-					continue;
-				}
-				//original
-				else if(randomedMatrix[i][j]==-2){
-					int topK=4;
-					int simUserClusterCount=0;
-					float allClusterMean=0;
-					for(int u=0;u<aSimUserSet.getSimUserList().size();u++){
-						SimUser aSimUser = aSimUserSet.getSimUser(u);
-						if(userNoInItem.contains(aSimUser.getUserNo())){ //simuser invoke the item
-							UserSet aUserSet = aUserSetInItem.getUserSet(aSimUser.getUserNo());
-							ArrayList<Integer> clustedUserNoList = aUserSet.getUserNoList();
-							float clusterMean=0;
-							int simUserInAClusterCount=0;
-							for(int a=0; a<clustedUserNoList.size(); a++){
-								if(!unRUL.contains(clustedUserNoList.get(a))){
-									clusterMean += randomedMatrix[clustedUserNoList.get(a)][j];
-									simUserInAClusterCount++;
-								}
-							}
-							if(simUserInAClusterCount!=0){
-								simUserClusterCount++;
-								simFlag=1;
-								allClusterMean+=clusterMean/simUserInAClusterCount; //get the cluster Mean of the cluster
-							}
-						}
-						
-						if(simUserClusterCount==topK){
-							predictedMatrix[i][j] = allClusterMean/topK;
-							break;
-						}
-						
-						if(u==aSimUserSet.getSimUserList().size()-1&&simUserClusterCount<topK&&simUserClusterCount!=0){
-							predictedMatrix[i][j] = allClusterMean/simUserClusterCount;
-						}
-					}
-					if(simUserClusterCount==0){
-						if(umean[i]!=-2){
-							predictedMatrix[i][j] = umean[i]; //no simUser, use UMEAN
-						}
-						else if(imean[j]!=-2){
-							predictedMatrix[i][j] = imean[j];
-						}
-						else
-							predictedMatrix[i][j] = -2;
-						
-					}
-					continue;
-				}
-				else{
-					predictedMatrix[i][j]=randomedMatrix[i][j];
-				}
-			}
-		}
-		return  predictedMatrix;
-
-		
 		
 	}
 	
@@ -442,126 +249,7 @@ public class Prediction {
 		System.out.println(unRUL.toString());
 	}
 	
-	
-	
-	///////////////////////////////////////////////////////
-	
-		
-	
-	public double[] cluserMean(float[][] originalMatrix, float[][] randomedMatrix,
-			float density, float random,int userNumber, int itemNumber, ArrayList<Integer> unreliableUserList, 
-			ArrayList<SimUserSet> simUserSetList, ArrayList<UserSetInItem> userSetInItemList){
-		
-		//outlier has been removed
-		randomedMatrix = removeOutlierUser(unreliableUserList,randomedMatrix);
-		
-		float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
-		
-//		System.out.println("Caculating begin: " + new Time(System.currentTimeMillis()));
-		float[] umean = UtilityFunctions.getUMean(randomedMatrix);
-		float[] imean = UtilityFunctions.getUMean(randomedMatrixT);
-		float[][] predictedMatrix = new float[randomedMatrix.length][randomedMatrix[0].length];
 
-		for(int i=0; i<userNumber; i++){
-			SimUserSet aSimUserSet = simUserSetList.get(i);
-			for(int j=0; j<itemNumber; j++){
-				ArrayList<Integer> userNoInItem = new ArrayList<Integer>(); //get the users who invoke the service
-				for(int index=0;index<userNumber;index++){
-					if(randomedMatrix[index][j]!=-1&&randomedMatrix[index][j]!=-2&&randomedMatrix[index][j]!=-3){
-						userNoInItem.add(index);
-					}
-				}
-				UserSetInItem aUserSetInItem = userSetInItemList.get(j); //get userSets in item j 
-				int simFlag =0; //flag for simuser
-				if(originalMatrix[i][j]==-1){  //no value in originalMatrix
-					predictedMatrix[i][j]=-1;
-					continue;
-				}
-			
-				else if(randomedMatrix[i][j]==-3){ //outlier
-					predictedMatrix[i][j] = imean[j];
-					continue;
-				}
-
-				
-				//original
-				else if(randomedMatrix[i][j]==-2){
-					int topK=3;
-					int simUserClusterCount=0;
-					float allClusterMean=0;
-					for(int u=0;u<aSimUserSet.getSimUserList().size();u++){
-						SimUser aSimUser = aSimUserSet.getSimUser(u);
-						if(userNoInItem.contains(aSimUser.getUserNo())){ //simuser invoke the item
-							
-							UserSet aUserSet = aUserSetInItem.getUserSet(aSimUser.getUserNo());
-
-							
-							ArrayList<Integer> clustedUserNoList = aUserSet.getUserNoList();
-							float clusterMean=0;
-							int simUserInAClusterCount=0;
-							for(int a=0; a<clustedUserNoList.size(); a++){
-								if(!unreliableUserList.contains(clustedUserNoList.get(a))){
-									clusterMean += randomedMatrix[clustedUserNoList.get(a)][j];
-									simUserInAClusterCount++;
-								}
-							}
-							if(simUserInAClusterCount!=0){
-								simUserClusterCount++;
-								simFlag=1;
-								allClusterMean+=clusterMean/simUserInAClusterCount; //get the cluster Mean of the cluster
-							}
-						}
-						
-						if(simUserClusterCount==topK){
-							predictedMatrix[i][j] = allClusterMean/topK;
-							break;
-						}
-						
-						if(u==aSimUserSet.getSimUserList().size()-1&&simUserClusterCount<topK&&simUserClusterCount!=0){
-							predictedMatrix[i][j] = allClusterMean/simUserClusterCount;
-						}
-					}
-					if(simUserClusterCount==0){
-						if(umean[i]!=-2){
-							predictedMatrix[i][j] = umean[i]; //no simUser, use UMEAN
-						}
-						else if(imean[j]!=-2){
-							predictedMatrix[i][j] = imean[j];
-						}
-						else
-							predictedMatrix[i][j] = -2;
-						
-					}
-					continue;
-				}
-
-				
-				else{
-					predictedMatrix[i][j]=randomedMatrix[i][j];
-				}
-			}
-		}
-//		System.out.println("Caculating end: " + new Time(System.currentTimeMillis()));
-		double mae_rmse_cluster[] = new double[2];
-		double mae=0;
-		double allnmae=0;
-		double nmae=0;
-		double rmse=0;
-		mae=MAE(originalMatrix, randomedMatrix, predictedMatrix);
-		rmse = RMSE(originalMatrix, randomedMatrix, predictedMatrix);
-//		allnmae = allNMAE(originalMatrix, randomedMatrix, predictedMatrix);
-//		nmae=NMAE(mae,allnmae);
-		mae_rmse_cluster[0] = mae;
-//		mae_rmse_cluster[1] = nmae;
-		mae_rmse_cluster[1] = rmse;
-//		System.out.println("MAE=" + mae_rmse_cluster[0]);
-//		System.out.println("RMSE=" + mae_rmse_cluster[1]);
-//		UtilityFunctions.writeMatrix(predictedMatrix, "RMSEResult/predicted/d"+density+"r"+random+"Cluster.txt");
-		
-		return mae_rmse_cluster;
-	}
-	
-	
 	public float[][] removeOutlierUser(ArrayList<Integer> unreliableUserList,float[][] randomedMatrix){
 		//mark the unreliable user from the randomedMatrix to -3
 		float[][] resultMatrix = new float[randomedMatrix.length][randomedMatrix[0].length];
