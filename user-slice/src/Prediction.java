@@ -23,14 +23,11 @@ public class Prediction {
 		float[][] originalMatrixT = UtilityFunctions.matrixTransfer(originalMatrix);
 		float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
 		
-		float[] umean = UtilityFunctions.getUMean(randomedMatrix);
-		float[] imean = UtilityFunctions.getUMean(randomedMatrixT);
-		
 		double[] mae_uicluster = new double[11]; 
 		double[] rmse_uicluster = new double[11];
 		
-		float[][] predictedMatrixUCluster = UserCluser(originalMatrix, randomedMatrix, umean, imean, K1);
-		float[][] predictedMatrixIClusterT = ServiceCluser(originalMatrixT, randomedMatrixT, imean,umean, K2);
+		float[][] predictedMatrixUCluster = UserCluser(originalMatrix, randomedMatrix, K1);
+		float[][] predictedMatrixIClusterT = ServiceCluser(originalMatrixT, randomedMatrixT, K2);
 		
 //		UtilityFunctions.writeMatrix(predictedMatrixUCluster, "RMSEResult/predicted/d"+density+"ucluster.txt");
 //		UtilityFunctions.writeMatrix(predictedMatrixIPCC, "RMSEResult/predicted/d"+density+"ipcc.txt");
@@ -76,7 +73,7 @@ public class Prediction {
 		
 	}
 	
-	public float[][] UserCluser(float[][] originalMatrix, float[][] randomedMatrix, float[] umean, float[] imean, int K){
+	public float[][] UserCluser(float[][] originalMatrix, float[][] randomedMatrix, int K){
 		
 		int userNumber = originalMatrix.length;
 		int itemNumber = originalMatrix[0].length;
@@ -160,6 +157,11 @@ public class Prediction {
 		
 		//outlier has been removed
 		randomedMatrix = removeOutlierUser(unRUL,randomedMatrix);
+		float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
+		
+		float[] umean = UtilityFunctions.getUMean(randomedMatrix);
+		float[] imean = UtilityFunctions.getUMean(randomedMatrixT);
+		
 		
 //		float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
 		
@@ -244,7 +246,7 @@ public class Prediction {
 	
 	
 	
-	public float[][] ServiceCluser(float[][] originalMatrix, float[][] randomedMatrix, float[] umean, float[] imean, int K){
+	public float[][] ServiceCluser(float[][] originalMatrix, float[][] randomedMatrix, int K){
 		int userNumber = originalMatrix.length;
 		int itemNumber = originalMatrix[0].length;
 		float[] itemRtList;
@@ -311,6 +313,11 @@ public class Prediction {
 		}
 		//outlier has been removed
 		randomedMatrix = removeOutlierItem(unRUL,randomedMatrix);
+		float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
+		
+		float[] umean = UtilityFunctions.getUMean(randomedMatrix);
+		float[] imean = UtilityFunctions.getUMean(randomedMatrixT);
+		
 		
 //		System.out.println("Caculating begin: " + new Time(System.currentTimeMillis()));
 		float[][] predictedMatrix = new float[randomedMatrix.length][randomedMatrix[0].length];
