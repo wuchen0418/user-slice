@@ -196,10 +196,12 @@ public class process {
 			
 			float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", userNumber, itemNumber);		
 			Prediction prediction = new Prediction();
-//			Predictor predictor = new Predictor();
+			Predictor predictor = new Predictor();
 			double[] mae_rmse_uicluster = prediction.runUICluster(originalMatrix, randomedMatrix, density, random, userNumber, itemNumber, K1);
 //			double[] mae_rmse_3method = prediction.runUIPCC(originalMatrix, randomedMatrix, density, 34);
-//			double[][] mae_rmse_rap = predictor.run8Methods(originalMatrix, randomedMatrix, random, 34, density, (float)0.1);
+			double[][] mae_rmse_rap = predictor.run8Methods(originalMatrix, randomedMatrix, random, 34, density, (float)0.1);
+			mae_rmse_rap = UtilityFunctions.matrixTransfer(mae_rmse_rap);
+			
 //			double mae_rmse_rap2[] = new double[4];
 			
 //			mae_rmse_rap2[0] = mae_rmse_rap[0][0];
@@ -209,78 +211,72 @@ public class process {
 //			
 //			System.arraycopy(mae_rmse_3method, 0, mae_rmse_4method[count], 0, 3);
 //			System.arraycopy(mae_rmse_3method, 3, mae_rmse_4method[count], 4, 3);
-			System.arraycopy(mae_rmse_uicluster, 0, mae_rmse_4method[count], 0, 2);
+			
+			System.arraycopy(mae_rmse_rap[0], 0, mae_rmse_4method[count], 0, 4);
+			System.arraycopy(mae_rmse_rap[1], 0, mae_rmse_4method[count], 5, 4);
+			System.arraycopy(mae_rmse_uicluster, 0, mae_rmse_4method[count], 4, 1);
+			System.arraycopy(mae_rmse_uicluster, 1, mae_rmse_4method[count], 9, 1);
 //			System.arraycopy(mae_rmse_cluster, 0, mae_rmse_4method[count], 2, 2);
 //			System.arraycopy(mae_rmse_cluster, 3, mae_rmse_4method[count], 3, 3);
 //			System.arraycopy(mae_rmse_rap2, 0, mae_rmse_4method[count], 8, 2);
 //			System.arraycopy(mae_rmse_rap2, 2, mae_rmse_4method[count], 10, 2);
 			
-			System.out.println(count+": "+"mae__rmse_4method = \t"+mae_rmse_4method[count][0]+"\t"+mae_rmse_4method[count][1]+"\t"+mae_rmse_4method[count][2]+"\t"+mae_rmse_4method[count][3]);
+			System.out.println(count+": "+"mae__rmse_4method = \t"+mae_rmse_4method[count][0]+"\t"+mae_rmse_4method[count][1]+"\t"+mae_rmse_4method[count][2]+"\t"+mae_rmse_4method[count][3]
+					+"\t"+mae_rmse_4method[count][4]+"\t"+mae_rmse_4method[count][5]+"\t"+mae_rmse_4method[count][6]+"\t"+mae_rmse_4method[count][7]+"\t"+mae_rmse_4method[count][8]+"\t"+mae_rmse_4method[count][9]);
 		}
 		double mae_upcc_mean = 0;
 		double mae_ipcc_mean = 0;
 		double mae_uipcc_mean = 0;
-		double mae_cluster_mean = 0;
-		double mae_uipcc2_mean=0;
 		double mae_rap_mean=0;
+		double mae_ucluster_mean = 0;
+		
 		
 		double rmse_upcc_mean = 0;
 		double rmse_ipcc_mean = 0;
 		double rmse_uipcc_mean = 0;
-		double rmse_cluster_mean = 0;
-		double rmse_uipcc2_mean = 0;
 		double rmse_rap_mean = 0;
+		double rmse_ucluster_mean = 0;
+		
 		
 		for(int t=0; t<20; t++){
 			mae_upcc_mean += mae_rmse_4method[t][0];
 			mae_ipcc_mean += mae_rmse_4method[t][1];
 			mae_uipcc_mean += mae_rmse_4method[t][2];
-			mae_cluster_mean += mae_rmse_4method[t][3];
+			mae_rap_mean += mae_rmse_4method[t][3];
+			mae_ucluster_mean += mae_rmse_4method[t][4];
 			
-//			rmse_upcc_mean += mae_rmse_4method[t][3];
-//			rmse_ipcc_mean += mae_rmse_4method[t][4];
-//			rmse_uipcc_mean += mae_rmse_4method[t][5];
-//			rmse_cluster_mean += mae_rmse_4method[t][7];
-			
-//			mae_uipcc2_mean += mae_rmse_4method[t][8];
-//			mae_rap_mean += mae_rmse_4method[t][10];
-//			
-//			rmse_uipcc2_mean += mae_rmse_4method[t][9];
-//			rmse_rap_mean += mae_rmse_4method[t][11];
+			rmse_upcc_mean += mae_rmse_4method[t][5];
+			rmse_ipcc_mean += mae_rmse_4method[t][6];
+			rmse_uipcc_mean += mae_rmse_4method[t][7];
+			rmse_rap_mean += mae_rmse_4method[t][8];
+			rmse_ucluster_mean += mae_rmse_4method[t][9];
 		}
 		mae_upcc_mean = mae_upcc_mean/loopNum;
 		mae_ipcc_mean = mae_ipcc_mean/loopNum;
 		mae_uipcc_mean = mae_uipcc_mean/loopNum;
-		mae_cluster_mean = mae_cluster_mean/loopNum;
+		mae_rap_mean = mae_rap_mean/loopNum;
+		rmse_ucluster_mean = rmse_ucluster_mean/loopNum;
 		
 		rmse_upcc_mean = rmse_upcc_mean/loopNum;
 		rmse_ipcc_mean = rmse_ipcc_mean/loopNum;
 		rmse_uipcc_mean = rmse_uipcc_mean/loopNum;
-		rmse_cluster_mean = rmse_cluster_mean/loopNum;
-		
-		mae_uipcc2_mean = mae_uipcc2_mean/loopNum;
-		mae_rap_mean = mae_rap_mean/loopNum;
-		rmse_uipcc2_mean = rmse_uipcc2_mean/loopNum;
 		rmse_rap_mean = rmse_rap_mean/loopNum;
+		rmse_ucluster_mean = rmse_ucluster_mean/loopNum;
 		
 		mae_rmse_4method[20][0]=mae_upcc_mean;
 		mae_rmse_4method[20][1]=mae_ipcc_mean;
 		mae_rmse_4method[20][2]=mae_uipcc_mean;
-		mae_rmse_4method[20][3]=mae_cluster_mean;
+		mae_rmse_4method[20][3]=mae_rap_mean;
+		mae_rmse_4method[20][4]=mae_ucluster_mean;
 		
-//		mae_rmse_4method[20][3] = rmse_upcc_mean;
-//		mae_rmse_4method[20][4] = rmse_ipcc_mean;
-//		mae_rmse_4method[20][5] = rmse_uipcc_mean;
-//		mae_rmse_4method[20][7] = rmse_cluster_mean;
-//		
-//		mae_rmse_4method[20][8]=mae_uipcc2_mean;
-//		mae_rmse_4method[20][10]=mae_rap_mean;
-//		
-//		mae_rmse_4method[20][9] = rmse_uipcc2_mean;
-//		mae_rmse_4method[20][11] = rmse_rap_mean;
+		mae_rmse_4method[20][5] = rmse_upcc_mean;
+		mae_rmse_4method[20][6] = rmse_ipcc_mean;
+		mae_rmse_4method[20][7] = rmse_uipcc_mean;
+		mae_rmse_4method[20][8] = rmse_rap_mean;
+		mae_rmse_4method[20][9] = rmse_ucluster_mean;
+
 		
-		
-		
-		System.out.println("mae__rmse_4method(mean) = \t"+mae_rmse_4method[20][0]+"\t"+mae_rmse_4method[20][1]+"\t"+mae_rmse_4method[20][2]+"\t"+mae_rmse_4method[20][3]);
+		System.out.println("mae__rmse_4method(mean) = \t"+mae_rmse_4method[20][0]+"\t"+mae_rmse_4method[20][1]+"\t"+mae_rmse_4method[20][2]+"\t"+mae_rmse_4method[20][3]
+				+"\t"+mae_rmse_4method[20][4]+"\t"+mae_rmse_4method[20][5]+"\t"+mae_rmse_4method[20][6]+"\t"+mae_rmse_4method[20][7]+"\t"+mae_rmse_4method[20][8]+"\t"+mae_rmse_4method[20][9]);
 	}
 }

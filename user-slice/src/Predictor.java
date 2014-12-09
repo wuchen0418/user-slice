@@ -27,8 +27,11 @@ public class Predictor {
 	public double[][] run8Methods(float[][] originalMatrix, float[][] randomedMatrix, float random, int topK, float density, float factord){
 		float[][] originalMatrixT = UtilityFunctions.matrixTransfer(originalMatrix);
 		float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
-		int methodNumber = 3;
+		int methodNumber = 4;
 		double[][] mae_rmse = new double[methodNumber][2];
+		double mae = 0;
+		double allnmae = 0;
+		double nmae = 0;
 		
 		//UMEAN
 		//calculate the mean failure rate of services that each user called
@@ -56,52 +59,56 @@ public class Predictor {
 		
 		// UPCC
 		//System.out.println("calculating UPCC: " + new Time(System.currentTimeMillis()));
-		System.out.println("calculating UIPCC: " + new Time(System.currentTimeMillis()));
+//		System.out.println("calculating UIPCC: " + new Time(System.currentTimeMillis()));
 		float[][] predictedMatrixUPCC = UPCC(originalMatrix, randomedMatrix, 
 				umean, topK, true);
-		/*mae = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixUPCC);
-		rmse = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixUPCC);
-		System.out.println("UPCC:\t" + mae + "\t" + rmse);
-		mae_rmse[2][0] = mae;
-		mae_rmse[2][1] = rmse;*/
+		mae = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixUPCC);
+		allnmae = UtilityFunctions.allNMAE(originalMatrix, randomedMatrix, predictedMatrixUPCC);
+		nmae = UtilityFunctions.NMAE(mae,allnmae);
+//		rmse = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixUPCC);
+//		System.out.println("UPCC:\t" + mae + "\t" + rmse);
+		mae_rmse[0][0] = mae;
+		mae_rmse[0][1] = nmae;
 		
 		// IPCC
 		//ipccList = calculatePccList(originalMatrixT, randomedMatrixT, imean, true, false, 20, 100);
 		//System.out.println("calculating IPCC: " + new Time(System.currentTimeMillis()));
 		float[][] predictedMatrixIPCC = UPCC(originalMatrixT, randomedMatrixT, 
 				imean, topK, false);
-		/*mae = UtilityFunctions.MAE(originalMatrixT, randomedMatrixT, predictedMatrixIPCC);
-		rmse = UtilityFunctions.RMSE(originalMatrixT, randomedMatrixT, predictedMatrixIPCC);
-		System.out.println("IPCC:\t" + mae + "\t" + rmse);
-		mae_rmse[3][0] = mae;
-		mae_rmse[3][1] = rmse;*/
+		mae = UtilityFunctions.MAE(originalMatrixT, randomedMatrixT, predictedMatrixIPCC);
+		allnmae = UtilityFunctions.allNMAE(originalMatrixT, randomedMatrixT, predictedMatrixIPCC);
+		nmae = UtilityFunctions.NMAE(mae,allnmae);
+//		rmse = UtilityFunctions.RMSE(originalMatrixT, randomedMatrixT, predictedMatrixIPCC);
+//		System.out.println("IPCC:\t" + mae + "\t" + rmse);
+		mae_rmse[1][0] = mae;
+		mae_rmse[1][1] = nmae;
 		
 		// UIPCC
-		double[] mae2 = new double[11]; 
-		double[] rmse2 = new double[11]; 
+		double[] mae2 = new double[11];
+		double[] allnmae2 = new double[11]; 
+		double[] nmae2 = new double[11]; 
+//		double[] rmse2 = new double[11]; 
 		double smallMAE = 100;
-		double smallRMSE = 100;
+		double smallNMAE =100;
+//		double smallRMSE = 100;
 		for (int i = 0; i < 11; i++) {
 			double lambda = (double)i/10.0;
 			float[][] predictedMatrixUIPCC = UIPCC(predictedMatrixUPCC, predictedMatrixIPCC, lambda);
 			mae2[i] =   UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixUIPCC);
-			rmse2[i] = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixUIPCC);
-			//smallMAE = UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixUIPCC);
-			//smallRMSE = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixUIPCC);
+			allnmae2[i] =   UtilityFunctions.allNMAE(originalMatrix, randomedMatrix, predictedMatrixUIPCC);
+			nmae2[i] = UtilityFunctions.NMAE(mae2[i],allnmae2[i]);
+			//rmse2[i] = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixUIPCC);
 		}
-		
-		smallMAE = 100;
-		smallRMSE = 100;
 		for (int i = 0; i < mae2.length; i++) {
 			if(mae2[i] < smallMAE) smallMAE = mae2[i];
-			if(rmse2[i] < smallRMSE) smallRMSE = rmse2[i];
+			if(nmae2[i] < smallNMAE) smallNMAE = nmae2[i];
 		}
 		//UtilityFunctions.writeFile("result.txt", "UIPCC:\t" + smallMAE + "\t" + smallRMSE + "\r\n");
-		mae_rmse[0][0] = smallMAE;
-		mae_rmse[0][1] = smallRMSE;
+		mae_rmse[2][0] = smallMAE;
+		mae_rmse[2][1] = smallNMAE;
     	
 		//RAP
-		System.out.println("calculating RAP: " + new Time(System.currentTimeMillis()));
+//		System.out.println("calculating RAP: " + new Time(System.currentTimeMillis()));
 		//System.out.println("Identifying Unreliable User: " + new Time(System.currentTimeMillis()));
 		getURR_L1AVG_Before(randomedMatrix, factord, 1000, imean); 
     	//for (int i=0 ;i <URR_L1AVG.length;i++)
@@ -125,40 +132,42 @@ public class Predictor {
     	
 		float[][] purifiedUPCC = UPCC(originalMatrix, purifiedData, 
 				URR_umean, topK, true);
-		
-		
-		
 		//System.out.println("calculating IPCC on purified Dataset: " + new Time(System.currentTimeMillis()));
 		float[][] purifiedIPCC = UPCC(originalMatrixT, purifiedMatrrixT, 
 				URR_imean, topK, false);
-		
-		
-		
-		double[] mae_urr_uipcc = new double[11]; 
-		double[] rmse_urr_uipcc = new double[11]; 
+
+		double[] mae_urr_uipcc = new double[11];
+		double[] allnmae_urr_uipcc = new double[11]; 
+		double[] nmae_urr_uipcc = new double[11]; 
+//		double[] rmse_urr_uipcc = new double[11]; 
 		for (int i = 0; i < 11; i++) {
 			double lambda = (double)i/10.0;
 			float[][] purifiedUIPCC = UIPCC(purifiedUPCC, purifiedIPCC, lambda);
 			mae_urr_uipcc[i] =   UtilityFunctions.MAE(originalMatrix, randomedMatrix, purifiedUIPCC);
-			rmse_urr_uipcc[i] = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, purifiedUIPCC);
+			allnmae_urr_uipcc[i] =   UtilityFunctions.allNMAE(originalMatrix, randomedMatrix, purifiedUIPCC);
+			nmae_urr_uipcc[i] =UtilityFunctions.NMAE(mae_urr_uipcc[i],allnmae_urr_uipcc[i]);
+//			rmse_urr_uipcc[i] = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, purifiedUIPCC);
 			//smallMAE =   UtilityFunctions.MAE(originalMatrix, randomedMatrix, purifiedUIPCC);
 			//smallRMSE = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, purifiedUIPCC);
 		//	System.out.println("UIPCC:" + i + "\t" + mae2[i] + "\t" + rmse2[i]);
 		}
 		
 		smallMAE = 100;
-		smallRMSE = 100;
+		smallNMAE =100;
+//		smallRMSE = 100;
 		for (int i = 0; i < mae_urr_uipcc.length; i++) {
 			if(mae_urr_uipcc[i] < smallMAE) smallMAE = mae_urr_uipcc[i];
-			if(rmse_urr_uipcc[i] < smallRMSE) smallRMSE = rmse_urr_uipcc[i];
+			if(nmae_urr_uipcc[i] < smallNMAE) smallNMAE = nmae_urr_uipcc[i];
 		}
 		
 		//UtilityFunctions.writeFile("result.txt", "RAP:\t" + smallMAE + "\t" + smallRMSE + "\r\n");
-		mae_rmse[1][0] = smallMAE;
-		mae_rmse[1][1] = smallRMSE;
+		mae_rmse[3][0] = smallMAE;
+		mae_rmse[3][1] = smallNMAE;
 		
 		
-		System.out.println("calculating RAPC: " + new Time(System.currentTimeMillis()));
+//		System.out.println("calculating RAPC: " + new Time(System.currentTimeMillis()));
+		
+		/*
 		getURR_L1AVG_After(randomedMatrix, factord, 1000, imean); 
     	//for (int i=0 ;i <URR_Cluster_AVG.length;i++)
     	//{
@@ -202,6 +211,8 @@ public class Predictor {
 		mae_rmse[2][0] = smallMAE;
 		mae_rmse[2][1] = smallRMSE;
 		
+		
+		*/
 		return mae_rmse;
 	}
 	

@@ -370,6 +370,16 @@ public class UtilityFunctions {
 		return result;
 	}
 	
+	public static double[][] matrixTransfer(double[][]originalMatrix) {
+		double[][] result = new double[originalMatrix[0].length][originalMatrix.length];
+		for (int i = 0; i < originalMatrix.length; i++) {
+			for (int j = 0; j < originalMatrix[0].length; j++) {
+				result[j][i] = originalMatrix[i][j];
+			}
+		}
+		return result;
+	}
+	
 	
 	/**
 	 *  outFile: removed entry use -2 to present.  

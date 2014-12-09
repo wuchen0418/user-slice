@@ -117,7 +117,7 @@ public class Prediction {
 		
 //		 printclustedUserList(simUserSetList);
 		
-		 printUserSetInItems(userSetInItemList);
+//		 printUserSetInItems(userSetInItemList);
 		//outlier has been removed
 		randomedMatrix = removeOutlierUser(unRUL,randomedMatrix);
 		float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
@@ -367,7 +367,6 @@ public class Prediction {
 			}
 		}
 		allNMAE=allNMAE/number;
-		System.out.println("allMAE=" + allNMAE);
 		return allNMAE;
 	}
 	
