@@ -305,18 +305,12 @@ public class Prediction {
 				userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
 			}
 		}
-		
-//		buildunRUL(userCount);
-		
 		simUserSetList = bulidSimUserSet(userSetInUserList, new ArrayList<Integer> (), userNumber);
 		for(int i=0; i<simUserSetList.size(); i++){
 			simUserSetList.get(i).sortSimUser();
 		}
-		
 		//outlier has been removed
 		randomedMatrix = removeOutlierItem(unRUL,randomedMatrix);
-		
-//		float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
 		
 //		System.out.println("Caculating begin: " + new Time(System.currentTimeMillis()));
 		float[][] predictedMatrix = new float[randomedMatrix.length][randomedMatrix[0].length];
@@ -566,9 +560,6 @@ public class Prediction {
 		
 		return mae_rmse_cluster;
 	}
-	
-	
-	
 	
 	
 	public float[][] removeOutlierUser(ArrayList<Integer> unreliableUserList,float[][] randomedMatrix){

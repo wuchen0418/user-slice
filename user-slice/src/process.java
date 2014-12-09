@@ -176,7 +176,7 @@ public class process {
 	
 	public static void main(String[] args) {
 		double mae_rmse_4method[][] = new double[21][12];
-		int loopNum = 20;
+		int loopNum = 1;
 		for(int count=0; count<loopNum; count++){
 			String prefix = "WSDream-QoSDataset2/";
 			String matrix = "rtMatrix";
@@ -187,104 +187,16 @@ public class process {
 			int K1=7;
 			int K2 = 12;
 			float[][] randomedMatrix;
-			float[] itemRtList;
-			ArrayList<Integer> unreliableUser = new ArrayList<Integer>();
-			int[] userCount=new int[userNumber];
-			int[] indexSorted = new int[userNumber];
 			
 			float density = (float)0.1;
 			float random = (float)0.03;
 			
 			randomedMatrix = UtilityFunctions.readMatrix("randomed/" + matrix + density + "_" + random, userNumber, itemNumber);
-//			tester.buildUserSetInUserList(userNumber);
-//			tester.buildUserSetInItemList(itemNumber);
-			
-/*			for(int itemNo=0; itemNo<itemNumber; itemNo++){			
-				ArrayList<UserSet> userSetsInOneItem = new ArrayList<UserSet>();
-				itemRtList=tester.getItemRtList(itemNo, randomedMatrix, userNumber);
-				if(tester.userGreaterK(itemRtList,K)){
-					KMeans kMeans = new KMeans(itemRtList,K);
-					kMeans.cluster();
-					userSetsInOneItem = kMeans.buildUserSet(itemNo);
-					
-					tester.userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));				
-					for(int i=0; i<userSetsInOneItem.size(); i++){
-						UserSet aUserSet = userSetsInOneItem.get(i);
-						ArrayList<Integer> usersInUserSet = new ArrayList<Integer>(); //store the userno in userSet
-						usersInUserSet = aUserSet.getUserNoList();
-						for(int u=0; u<usersInUserSet.size(); u++){
-							int userno = usersInUserSet.get(u);
-							UserSetInUser temUser = tester.userSetInUserList.get(userno);
-							temUser.addUserSetInUserList(aUserSet);
-							tester.userSetInUserList.set(userno, temUser);
-						}
-					}
-
-					if(kMeans.getClustersNum()!=0){
-						unreliableUser = kMeans.getUnreliableUserList();
-	//					if(unreliableUser.size()>0){
-							for(int i=0; i<unreliableUser.size();i++){
-								int userNo = unreliableUser.get(i);
-								userCount[userNo]++;
-							}
-	//						System.out.println(unreliableUser.toString());
-							unreliableUser.clear();
-	//					}
-					}
-		
-				}
-				else{
-					int c=0;
-					for(int t=0; t<itemRtList.length; t++){
-						float x = itemRtList[t];
-						if(x!=-2&&x!=-1){
-							UserSet aUserSet = new UserSet(itemNo,c);
-							aUserSet.addUser(t);
-							userSetsInOneItem.add(aUserSet);
-							c++;
-							
-							UserSetInUser temUser = tester.userSetInUserList.get(t);
-							temUser.addUserSetInUserList(aUserSet);
-							tester.userSetInUserList.set(t, temUser);
-							
-						}
-					}
-					tester.userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
-				}
-			}*/
-	
-/*			KMeans kMeans2 = new KMeans(userCount);
-			kMeans2.cluster();
-			ArrayList<Integer> unRUL=kMeans2.getUnreliableUserList();
-	//		kMeans2.printPoints();
-	//		kMeans2.printClusters();
-	//		kMeans2.printBelongs();
-			System.out.println(unRUL.toString());*/
-			
-	//		System.out.println();
-	//		System.out.println("sorted");
-			
-//			indexSorted = tester.sortIndex(userCount);
-	//		for(int i=0; i<userNumber; i++){
-	//			System.out.println("No."+i+" index="+indexSorted[i]+" countNum="+userCount[i]+"\t");
-	//		}
-	//		tester.printUserSetInItems();
-	//		tester.writeUser("userClusted.txt");
-/*			tester.bulidSimUserSet(tester.userSetInUserList, unRUL);
-			for(int i=0; i<tester.simUserSetList.size(); i++){
-				tester.simUserSetList.get(i).sortSimUser();
-				
-			}*/
-//			simUserSetList.get(163).printSimUser();
-	//		tester.printclustedUserList();
-			
+						
 			float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", userNumber, itemNumber);		
 			Prediction prediction = new Prediction();
 //			Predictor predictor = new Predictor();
-
-//			double[] mae_rmse_cluster = prediction.cluserMean(originalMatrix, randomedMatrix, density, random, userNumber, itemNumber, unRUL, tester.simUserSetList, tester.userSetInItemList);
 			double[] mae_rmse_cluster = prediction.runUICluster(originalMatrix, randomedMatrix, density, random, userNumber, itemNumber, K1, K2);
-			
 			
 //			double[] mae_rmse_3method = prediction.runUIPCC(originalMatrix, randomedMatrix, density, 34);
 //			double[][] mae_rmse_rap = predictor.run8Methods(originalMatrix, randomedMatrix, random, 34, density, (float)0.1);
