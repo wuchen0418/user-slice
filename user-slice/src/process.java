@@ -176,7 +176,7 @@ public class process {
 	
 	public static void main(String[] args) {
 		double mae_rmse_4method[][] = new double[21][12];
-		int loopNum = 1;
+		int loopNum = 20;
 		for(int count=0; count<loopNum; count++){
 			String prefix = "WSDream-QoSDataset2/";
 			String matrix = "rtMatrix";
@@ -195,6 +195,8 @@ public class process {
 			float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", userNumber, itemNumber);		
 			Prediction prediction = new Prediction();
 			Predictor predictor = new Predictor();
+//			String userLoactionFileName = "userlist.txt";
+//			predictor.initUserLocationMap(prefix + userLoactionFileName);
 			double[] mae_rmse_uicluster = prediction.runUICluster(originalMatrix, randomedMatrix, density, random, userNumber, itemNumber, K1);
 //			double[] mae_rmse_3method = prediction.runUIPCC(originalMatrix, randomedMatrix, density, 34);
 			double[][] mae_rmse_rap = predictor.run8Methods(originalMatrix, randomedMatrix, random, 34, density, (float)0.1);
@@ -238,7 +240,7 @@ public class process {
 		mae_ipcc_mean = mae_ipcc_mean/loopNum;
 		mae_uipcc_mean = mae_uipcc_mean/loopNum;
 		mae_rap_mean = mae_rap_mean/loopNum;
-		rmse_ucluster_mean = rmse_ucluster_mean/loopNum;
+		mae_ucluster_mean = mae_ucluster_mean/loopNum;
 		
 		rmse_upcc_mean = rmse_upcc_mean/loopNum;
 		rmse_ipcc_mean = rmse_ipcc_mean/loopNum;

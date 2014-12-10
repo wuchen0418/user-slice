@@ -194,25 +194,25 @@ public class Predictor {
 			double lambda = (double)i/10.0;
 			float[][] predictedMatrixURR_UIPCC = UIPCC(purifiedUPCC, purifiedIPCC, lambda);
 			mae_urr_uipcc[i] =   UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC);
-			rmse_urr_uipcc[i] = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC);
+//			rmse_urr_uipcc[i] = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC);
 			//smallMAE =   UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC);
 			//smallRMSE = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixURR_UIPCC);
 			//System.out.println("UIPCC:" + i + "\t" + mae2[i] + "\t" + rmse2[i]);
 		}
 		
 		smallMAE = 100;
-		smallRMSE = 100;
+//		smallRMSE = 100;
 		for (int i = 0; i < mae_urr_uipcc.length; i++) {
 			if(mae_urr_uipcc[i] < smallMAE) smallMAE = mae_urr_uipcc[i];
-			if(rmse_urr_uipcc[i] < smallRMSE) smallRMSE = rmse_urr_uipcc[i];
+//			if(rmse_urr_uipcc[i] < smallRMSE) smallRMSE = rmse_urr_uipcc[i];
 		}
 		
 		//UtilityFunctions.writeFile("result.txt", "RAPC:\t" + smallMAE + "\t" + smallRMSE + "\r\n");
-		mae_rmse[2][0] = smallMAE;
-		mae_rmse[2][1] = smallRMSE;
-		
+		mae_rmse[1][0] = smallMAE;
+//		mae_rmse[2][1] = smallRMSE;
 		
 		*/
+		
 		return mae_rmse;
 	}
 	
