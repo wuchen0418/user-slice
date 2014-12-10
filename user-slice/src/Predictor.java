@@ -116,7 +116,7 @@ public class Predictor {
     	//	UtilityFunctions.writeFile("URR/URRBefore_"+density+"_"+random+".txt", URR_L1AVG[i]+"\t");
     	//}
     	//UtilityFunctions.writeFile("URR/URRBefore_"+density+"_"+random+".txt", "\r\n");
-    	getUnreliableUserList(URR_L1AVG);
+    	getUnreliableUserList(URR_L1AVG,15);
     	
     	
     	float[][] purifiedData = purifyDataset(randomedMatrix);
@@ -212,7 +212,7 @@ public class Predictor {
 //		mae_rmse[2][1] = smallRMSE;
 		
 		*/
-		
+		unreliableUserList.clear();
 		return mae_rmse;
 	}
 	
@@ -1089,29 +1089,30 @@ public class Predictor {
 		return URR_L2AVG;
 	}
 	
-//	public void getUnreliableUserList(float[] URR, float unreliableNum) {
-//		//Test if the URR algorithm can identify unreliable users. (Yes)
-//		ArrayList<Float> list = new ArrayList<Float>();
-//		HashMap map = new HashMap();
-//		for (int i = 0; i < URR.length; i++) {
-//			list.add(new Float(URR[i]));	
-//			map.put(i, URR[i]);
-//		}
-//		Collections.sort(list);
-//		//Collections.reverse(list);
-//		
-//		unreliableUserList = new ArrayList();
-//		for (int i = 0; i < unreliableNum; i++) {
-//			unreliableUserList.add(UtilityFunctions.getMapKeyByValue(map, list.get(i)));
-//		}
-//	}
-	
-	public void getUnreliableUserList(float[] URR) {
+	public void getUnreliableUserList(float[] URR, float unreliableNum) {
 		//Test if the URR algorithm can identify unreliable users. (Yes)
-		KMeans kMeans = new KMeans(URR,2);
-		kMeans.cluster();
-		unreliableUserList=kMeans.getUnreliableUserList();
+		ArrayList<Float> list = new ArrayList<Float>();
+		HashMap map = new HashMap();
+		for (int i = 0; i < URR.length; i++) {
+			list.add(new Float(URR[i]));	
+			map.put(i, URR[i]);
+		}
+		Collections.sort(list);
+		//Collections.reverse(list);
+		
+		unreliableUserList = new ArrayList();
+		for (int i = 0; i < unreliableNum; i++) {
+			unreliableUserList.add(UtilityFunctions.getMapKeyByValue(map, list.get(i)));
+		}
 	}
+	
+//	public void getUnreliableUserList(float[] URR) {
+//		//Test if the URR algorithm can identify unreliable users. (Yes)
+//		KMeans kMeans = new KMeans(URR,2);
+//		kMeans.cluster();
+//		unreliableUserList=kMeans.getUnreliableUserList();
+//		System.out.println(unreliableUserList.toString());
+//	}
 	
 	public float[] getURR_umean(float[][] removedMatrix, float[] URR) {
 		float[] umean = new float[removedMatrix.length];
