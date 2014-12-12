@@ -106,7 +106,9 @@ public class Predictor {
 		//UtilityFunctions.writeFile("result.txt", "UIPCC:\t" + smallMAE + "\t" + smallRMSE + "\r\n");
 		mae_rmse[2][0] = smallMAE;
 		mae_rmse[2][1] = smallNMAE;
-    	
+  
+		
+		
 		//RAP
 //		System.out.println("calculating RAP: " + new Time(System.currentTimeMillis()));
 		//System.out.println("Identifying Unreliable User: " + new Time(System.currentTimeMillis()));
@@ -163,6 +165,8 @@ public class Predictor {
 		//UtilityFunctions.writeFile("result.txt", "RAP:\t" + smallMAE + "\t" + smallRMSE + "\r\n");
 		mae_rmse[3][0] = smallMAE;
 		mae_rmse[3][1] = smallNMAE;
+		
+		
 		
 		
 //		System.out.println("calculating RAPC: " + new Time(System.currentTimeMillis()));

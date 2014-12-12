@@ -149,7 +149,7 @@ public class Prediction {
 				}
 				//original
 				else if(randomedMatrix[i][j]==-2){
-					int topK=2;
+					int topK=1;
 					int simUserClusterCount=0;
 					float allClusterMean=0;
 					for(int u=0;u<aSimUserSet.getSimUserList().size();u++){
@@ -333,7 +333,7 @@ public class Prediction {
 				}
 			}
 		}
-//		UtilityFunctions.writeMatrix(allMAEMatrix, "RMSEResult/mae_ucluster.txt");
+		UtilityFunctions.writeMatrix(allMAEMatrix, "RMSEResult/mae_ucluster.txt");
 		return allMAE/number;
 	}
 	
@@ -367,6 +367,8 @@ public class Prediction {
 			}
 		}
 		allNMAE=allNMAE/number;
+		System.out.println("allNMAE:"+allNMAE);
+
 		return allNMAE;
 	}
 	

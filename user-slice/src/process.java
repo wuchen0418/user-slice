@@ -14,13 +14,13 @@ public class process {
 
 	public void preProcess() {
 		String prefix = "WSDream-QoSDataset2/";
-		String matrix = "rtMatrix"; 
+		String matrix = "NormalizedtpMatrix"; 
 		float[][] removedMatrix;
 		float[][] randomedMatrix;
 		
 		float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", this.userNumber, this.itemNumber);
 		float density = (float)0.1;
-		float random = (float)0.015;
+		float random = (float)0.02;
 		
 		removedMatrix = UtilityFunctions.removeEntry(originalMatrix, density, "randomed//" + matrix + "30");			
 		randomedMatrix = UtilityFunctions.randomEntry(removedMatrix, random);
@@ -179,7 +179,7 @@ public class process {
 		int loopNum = 20;
 		for(int count=0; count<loopNum; count++){
 			String prefix = "WSDream-QoSDataset2/";
-			String matrix = "rtMatrix";
+			String matrix = "NormalizedtpMatrix";
 			process tester= new process();
 			tester.preProcess();
 			int userNumber = 339; 
@@ -188,7 +188,7 @@ public class process {
 			float[][] randomedMatrix;
 
 			float density = (float)0.1;
-			float random = (float)0.015;
+			float random = (float)0.02;
 			
 			randomedMatrix = UtilityFunctions.readMatrix("randomed/" + matrix + density + "_" + random, userNumber, itemNumber);
 			
