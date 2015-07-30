@@ -730,6 +730,60 @@ public class UtilityFunctions {
 		return mean/(float) vector.length;		
 	}
 	
+	public static double getPCC(float[] u1, float[] u2, double mean1, double mean2){
+		// get the index of the common rated items.
+		Vector<Integer> commonRatedKey = new Vector<Integer>();
+		
+		for (int i = 0; i < u1.length; i++) {
+			if(u1[i] >= 0 && u2[i] >= 0) {
+				commonRatedKey.add(i);
+			}
+		}
+		
+		// no common rate items. 
+		if(commonRatedKey.size() == 0 || commonRatedKey.size() == 1) 
+			return -2;
+		
+		
+		double pcc = 0;
+		double upperAll = 0;
+		double downAll1 = 0;
+		double downAll2 = 0;
+
+		for (int i = 0; i < commonRatedKey.size(); i++) {
+			int key = commonRatedKey.get(i);
+			double value1 = u1[key];
+			double value2 = u2[key];
+			
+			double temp1 = value1 - mean1;
+			double temp2 = value2 - mean2;
+			
+			if(temp1 < 0.00001 && temp1 > 0) temp1 = 0.00001;
+			if(temp2 < 0.00001 && temp2 > 0) temp2 = 0.00001;
+
+			if(temp1 > -0.00001 && temp1 < 0) temp1 = -0.00001;
+			if(temp2 > -0.00001 && temp2 < 0) temp2 = -0.00001;
+			
+			upperAll += temp1 * temp2;
+			downAll1 += temp1 * temp1;
+			downAll2 += temp2 * temp2;
+		}
+		
+		double downValue = Math.sqrt(downAll1 * downAll2);
+		
+		if(downValue == 0) 
+			return -2;
+		
+		pcc = upperAll / downValue;
+		
+		//use significant weight to avoid the over estimation problem.
+		// 10 is a parameter, which can be set.
+		/*if(isSW && commonRatedKey.size() < swThreshold) {
+			pcc = pcc * commonRatedKey.size() / swThreshold;
+		}*/
+		return pcc;
+	}
+	
 
 
 }

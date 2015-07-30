@@ -14,13 +14,13 @@ public class process {
 
 	public void preProcess() {
 		String prefix = "WSDream-QoSDataset2/";
-		String matrix = "NormalizedtpMatrix"; 
+		String matrix = "rtMatrix"; 
 		float[][] removedMatrix;
 		float[][] randomedMatrix;
 		
 		float[][] originalMatrix = UtilityFunctions.readMatrix(prefix + matrix + ".txt", this.userNumber, this.itemNumber);
 		float density = (float)0.1;
-		float random = (float)0.015;
+		float random = (float)0.03;
 		
 		removedMatrix = UtilityFunctions.removeEntry(originalMatrix, density, "randomed//" + matrix + "30");			
 		randomedMatrix = UtilityFunctions.randomEntry(removedMatrix, random);
@@ -179,7 +179,7 @@ public class process {
 		int loopNum = 20;
 		for(int count=0; count<loopNum; count++){
 			String prefix = "WSDream-QoSDataset2/";
-			String matrix = "NormalizedtpMatrix";
+			String matrix = "rtMatrix";
 			process tester= new process();
 			tester.preProcess();
 			int userNumber = 339; 
@@ -188,7 +188,7 @@ public class process {
 			float[][] randomedMatrix;
 
 			float density = (float)0.1;
-			float random = (float)0.015;
+			float random = (float)0.03;
 			
 			randomedMatrix = UtilityFunctions.readMatrix("randomed/" + matrix + density + "_" + random, userNumber, itemNumber);
 			
@@ -199,11 +199,11 @@ public class process {
 //			predictor.initUserLocationMap(prefix + userLoactionFileName);
 			double[] mae_rmse_uicluster = prediction.runUICluster(originalMatrix, randomedMatrix, density, random, userNumber, itemNumber, K1);
 //			double[] mae_rmse_3method = prediction.runUIPCC(originalMatrix, randomedMatrix, density, 34);
-			double[][] mae_rmse_rap = predictor.run8Methods(originalMatrix, randomedMatrix, random, 34, density, (float)0.1);
-			mae_rmse_rap = UtilityFunctions.matrixTransfer(mae_rmse_rap);
-			
-			System.arraycopy(mae_rmse_rap[0], 0, mae_rmse_4method[count], 0, 4);
-			System.arraycopy(mae_rmse_rap[1], 0, mae_rmse_4method[count], 5, 4);
+//			double[][] mae_rmse_rap = predictor.run8Methods(originalMatrix, randomedMatrix, random, 34, density, (float)0.1);
+//			mae_rmse_rap = UtilityFunctions.matrixTransfer(mae_rmse_rap);
+//			
+//			System.arraycopy(mae_rmse_rap[0], 0, mae_rmse_4method[count], 0, 4);
+//			System.arraycopy(mae_rmse_rap[1], 0, mae_rmse_4method[count], 5, 4);
 			System.arraycopy(mae_rmse_uicluster, 0, mae_rmse_4method[count], 4, 1);
 			System.arraycopy(mae_rmse_uicluster, 1, mae_rmse_4method[count], 9, 1);
 

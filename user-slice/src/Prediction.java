@@ -14,6 +14,7 @@ import java.util.Vector;
 
 
 public class Prediction {
+	private static final String ALPHA = null;
 	private ArrayList<Integer> unRUL = new ArrayList<Integer>();
 	
 	public double[] runUICluster(float[][] originalMatrix, float[][] randomedMatrix,
@@ -27,6 +28,15 @@ public class Prediction {
 		double mae_ucluster = MAE(originalMatrix, randomedMatrix, predictedMatrixUCluster);
 		double allnmae_ucluster = allNMAE(originalMatrix, randomedMatrix, predictedMatrixUCluster);
 		double nmae_ucluster = NMAE(mae_ucluster, allnmae_ucluster);
+		
+		
+		//for pageRank
+		
+		
+		Object q1;
+//		calPageRank(q1, ALPHA);
+		
+		float[] umean = UtilityFunctions.getUMean(randomedMatrix);
 
 		mae_rmse_3method[0] = mae_ucluster;
 		mae_rmse_3method[1] = nmae_ucluster;	
