@@ -291,6 +291,27 @@ public class UtilityFunctions {
             e.printStackTrace();
         }
 	}
+	public static void writeMatrix(double[][] matrix, String fileName) {
+        try {
+            File file = new File(fileName);
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            String line = "";
+            for(int i =0; i < matrix.length; i++) {
+            	for(int j=0; j < matrix[0].length; j++) {
+            		line += matrix[i][j] + "\t";
+            	}
+            	writer.write(line);
+            	if (i < matrix.length -1) {
+            		writer.newLine();
+            	}
+            	line = "";
+            }
+            writer.flush();
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+	}
 	
 	public static void writeTestMatrix300x500(float[][] matrix, String fileName) {
 		try {

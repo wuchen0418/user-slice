@@ -33,6 +33,11 @@ public class SimUserSet
 		return this.userNo;
 	}
 	
+	public int getOutlierFlag()
+	{
+		return this.outlierFlag;
+	}
+	
 	public ArrayList<SimUser> getSimUserList()
 	{
 		return this.simUserList;

@@ -20,30 +20,49 @@ public class Prediction {
 	public double[] runUICluster(float[][] originalMatrix, float[][] randomedMatrix,
 			float density, float random,int userNumber, int itemNumber, int K1){		
 		
-		double mae_rmse_3method[] = new double[2];	
+		double nmae_2method[] = new double[3];	
+		float[][] originalMatrixT = UtilityFunctions.matrixTransfer(originalMatrix);
 		float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
-		float[][] predictedMatrixUCluster = UserCluser(originalMatrix, randomedMatrix, K1);
+		ArrayList<float[][]> predictedMatrixListUser = UserCluser(originalMatrix, randomedMatrix, K1);
+		ArrayList<float[][]> predictedMatrixListItem = ItemCluser(originalMatrixT, randomedMatrixT, K1);
 //		UtilityFunctions.writeMatrix(predictedMatrixUCluster, "RMSEResult/predicted/predictedMatrixUCluster.txt");
 
-		double mae_ucluster = MAE(originalMatrix, randomedMatrix, predictedMatrixUCluster);
-		double allnmae_ucluster = allNMAE(originalMatrix, randomedMatrix, predictedMatrixUCluster);
-		double nmae_ucluster = NMAE(mae_ucluster, allnmae_ucluster);
+		double mae_CAP = MAE(originalMatrix, randomedMatrix, predictedMatrixListUser.get(0));
+		double allnmae_CAP = allNMAE(originalMatrix, randomedMatrix, predictedMatrixListUser.get(0));
+		double nmae_CAP = NMAE(mae_CAP, allnmae_CAP);
 		
+		double mae_CAPE= MAE(originalMatrix, randomedMatrix, predictedMatrixListItem.get(0));
+		double allnmae_CAPE = allNMAE(originalMatrix, randomedMatrix, predictedMatrixListItem.get(0));
+		double nmae_CAPE= NMAE(mae_CAPE, allnmae_CAPE);
 		
-		//for pageRank
+		double[] mae2 = new double[11];
+		double[] allnmae2 = new double[11]; 
+		double[] nmae2 = new double[11]; 
+//		double[] rmse2 = new double[11]; 
+		double smallMAE = 100;
+		double smallNMAE =100;
+//		double smallRMSE = 100;
+		for (int i = 0; i < 11; i++) {
+			double lambda = (double)i/10.0;
+			float[][] predictedMatrixUIPCC = UIPCC(predictedMatrixListUser.get(0), predictedMatrixListItem.get(0), lambda);
+			mae2[i] =   UtilityFunctions.MAE(originalMatrix, randomedMatrix, predictedMatrixUIPCC);
+			allnmae2[i] =   UtilityFunctions.allNMAE(originalMatrix, randomedMatrix, predictedMatrixUIPCC);
+			nmae2[i] = UtilityFunctions.NMAE(mae2[i],allnmae2[i]);
+			//rmse2[i] = UtilityFunctions.RMSE(originalMatrix, randomedMatrix, predictedMatrixUIPCC);
+		}
+		for (int i = 0; i < mae2.length; i++) {
+			if(mae2[i] < smallMAE) smallMAE = mae2[i];
+			if(nmae2[i] < smallNMAE) smallNMAE = nmae2[i];
+		}
 		
-		
-		Object q1;
-//		calPageRank(q1, ALPHA);
-		
-		float[] umean = UtilityFunctions.getUMean(randomedMatrix);
-
-		mae_rmse_3method[0] = mae_ucluster;
-		mae_rmse_3method[1] = nmae_ucluster;	
-		return mae_rmse_3method;
+		nmae_2method[0] = nmae_CAP;
+		nmae_2method[1] = nmae_CAPE;
+		nmae_2method[2] = smallNMAE;
+		return nmae_2method;
 	}
 	
-	public float[][] UserCluser(float[][] originalMatrix, float[][] randomedMatrix, int K){
+	
+	public ArrayList<float[][]> UserCluser(float[][] originalMatrix, float[][] randomedMatrix, int K){
 		
 		int userNumber = originalMatrix.length;
 		int itemNumber = originalMatrix[0].length;
@@ -124,6 +143,9 @@ public class Prediction {
 		for(int i=0; i<simUserSetList.size(); i++){
 			simUserSetList.get(i).sortSimUser();
 		}
+
+		
+		
 		
 //		 printclustedUserList(simUserSetList);
 		
@@ -134,9 +156,221 @@ public class Prediction {
 		float[] umean = UtilityFunctions.getUMean(randomedMatrix);
 		float[] imean = UtilityFunctions.getUMean(randomedMatrixT);
 		
-//		System.out.println("Caculating begin: " + new Time(System.currentTimeMillis()));
-		float[][] predictedMatrix = new float[randomedMatrix.length][randomedMatrix[0].length];
+		///////////////////////////////////
+		//add pageRank
+//		double[][] pccMatrix = new double[userNumber][userNumber];
+//		for(int i=0; i<userNumber; i++){
+//			for(int j=0; j<userNumber; j++){
+//				pccMatrix[i][j]=getPCC(randomedMatrix[i], randomedMatrix[j], umean[i], umean[j]);
+//			}
+//		}
+		
+//		MatrixB matrixB = new MatrixB(simUserSetList,this.unRUL);
+//		MatrixB matrixB = new MatrixB(pccMatrix,this.unRUL);
+//		
+//		PageRank pageRank = new PageRank(matrixB.getList());		
+//		pageRank.calPageRank();
+//		pageRank.calSimilarity();
+//		double[][] simMatrix=new double[userNumber][userNumber];
+//		simMatrix=matrixB.uncompressMatrix(pageRank.getSimMatrix());
+//		
+//		UtilityFunctions.writeMatrix(simMatrix, "simMatrix/simMatrix.txt");
+		
+		
 
+		//////////////////////////////////
+		
+//		System.out.println("Caculating begin: " + new Time(System.currentTimeMillis()));
+		ArrayList<float[][]> predictedMatrixList = new ArrayList<float[][]>();
+		
+		float [][] cap_predicted= CAP(originalMatrix, randomedMatrix, umean, imean, userNumber,itemNumber,2, simUserSetList, userSetInItemList);
+//		float [][] cap_pagerank_predicted = CAP_PageRank(originalMatrix, randomedMatrix, umean, imean, simMatrix, userNumber, itemNumber);
+		
+		predictedMatrixList.add(cap_predicted);
+//		predictedMatrixList.add(cap_pagerank_predicted);
+//		UtilityFunctions.writeMatrix(cap_predicted, "simMatrix/cap-p.txt");
+//		UtilityFunctions.writeMatrix(cap_pagerank_predicted, "simMatrix/cape-p.txt");
+		
+		return  predictedMatrixList;
+		
+	}
+	
+public ArrayList<float[][]> ItemCluser(float[][] originalMatrix, float[][] randomedMatrix, int K){
+		
+		int userNumber = originalMatrix.length;
+		int itemNumber = originalMatrix[0].length;
+		float[] itemRtList;
+//		ArrayList<Integer> unreliableUser = new ArrayList<Integer>();
+		int[] userCount=new int[userNumber];
+		
+		
+		ArrayList<UserSetInUser> userSetInUserList = new ArrayList<UserSetInUser>();
+		ArrayList<UserSetInItem> userSetInItemList = new ArrayList<UserSetInItem>();
+		ArrayList<SimUserSet> simUserSetList = new ArrayList<SimUserSet>();
+		
+		for(int i=0; i<userNumber; i++){
+			userSetInUserList.add(i, new UserSetInUser(i));
+		}
+		
+		for(int i=0; i<itemNumber; i++){
+			userSetInItemList.add(i, new UserSetInItem(i));
+		}
+		
+		
+		for(int itemNo=0; itemNo<itemNumber; itemNo++){			
+			ArrayList<UserSet> userSetsInOneItem = new ArrayList<UserSet>();
+			itemRtList=getItemRtList(itemNo, randomedMatrix, userNumber);
+			if(userGreaterK(itemRtList,K)){
+				KMeans kMeans = new KMeans(itemRtList,K);
+				kMeans.cluster();
+				userSetsInOneItem = kMeans.buildUserSet(itemNo);
+				
+				userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));				
+				for(int i=0; i<userSetsInOneItem.size(); i++){
+					UserSet aUserSet = userSetsInOneItem.get(i);
+					ArrayList<Integer> usersInUserSet = new ArrayList<Integer>(); //store the userno in userSet
+					usersInUserSet = aUserSet.getUserNoList();
+					for(int u=0; u<usersInUserSet.size(); u++){
+						int userno = usersInUserSet.get(u);
+						UserSetInUser temUser = userSetInUserList.get(userno);
+						temUser.addUserSetInUserList(aUserSet);
+						userSetInUserList.set(userno, temUser);
+					}
+				}
+//				if(kMeans.getClustersNum()!=0){
+//					unreliableUser = kMeans.getUnreliableUserList();
+////					if(unreliableUser.size()>0){
+//						for(int i=0; i<unreliableUser.size();i++){
+//							int userNo = unreliableUser.get(i);
+//							userCount[userNo]++;
+//						}
+////						System.out.println(unreliableUser.toString());
+//						unreliableUser.clear();
+////					}
+//				}
+			}
+			else{
+				int c=0;
+				for(int t=0; t<itemRtList.length; t++){
+					float x = itemRtList[t];
+					if(x!=-2&&x!=-1){
+						UserSet aUserSet = new UserSet(itemNo,c);
+						aUserSet.addUser(t);
+						userSetsInOneItem.add(aUserSet);
+						c++;
+						
+						UserSetInUser temUser = userSetInUserList.get(t);
+						temUser.addUserSetInUserList(aUserSet);
+						userSetInUserList.set(t, temUser);
+						
+					}
+				}
+				userSetInItemList.set(itemNo, new UserSetInItem(itemNo,userSetsInOneItem));
+			}
+		}
+		
+//		buildunRUL(userCount);
+		simUserSetList = bulidSimUserSet(userSetInUserList, this.unRUL, userNumber);
+		for(int i=0; i<simUserSetList.size(); i++){
+			simUserSetList.get(i).sortSimUser();
+		}
+
+		
+//		 printclustedUserList(simUserSetList);
+		
+//		 printUserSetInItems(userSetInItemList);
+		//outlier has been removed
+		
+		randomedMatrix = removeOutlierItem(unRUL,randomedMatrix);
+		float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
+		float[] umean = UtilityFunctions.getUMean(randomedMatrix);
+		float[] imean = UtilityFunctions.getUMean(randomedMatrixT);
+		
+		
+//		System.out.println("Caculating begin: " + new Time(System.currentTimeMillis()));
+		ArrayList<float[][]> predictedMatrixList = new ArrayList<float[][]>();
+		
+		float [][] cap_predicted= CAP(originalMatrix, randomedMatrix, umean, imean, 
+				userNumber,itemNumber, 20 ,simUserSetList, userSetInItemList);
+		cap_predicted = UtilityFunctions.matrixTransfer(cap_predicted);
+		predictedMatrixList.add(cap_predicted);
+//		UtilityFunctions.writeMatrix(cap_predicted, "simMatrix/cap-p-i.txt");
+		
+		return  predictedMatrixList;
+		
+	}
+	
+	private float[][] CAP_PageRank(float[][] originalMatrix, float[][] randomedMatrix, float[] umean,
+			float[] imean, double[][] simMatrix, int userNum, int itemNum) {
+		
+		float[][] predictedMatrix = new float[userNum][itemNum];
+		for(int i=0; i<userNum; i++){
+			int topK=30;
+			
+			ArrayList<Integer> topkSimUserList = getTopKSimUser(simMatrix[i],topK);
+			
+			for(int j=0; j<itemNum; j++){
+				if(originalMatrix[i][j]==-1){  //no value in originalMatrix
+					predictedMatrix[i][j]=-1;
+					continue;
+				}
+			
+				else if(randomedMatrix[i][j]==-3){ //outlier
+					predictedMatrix[i][j] = imean[j];
+					continue;
+				}
+				//original
+				else if(randomedMatrix[i][j]==-2){
+					float simAll = 0;
+					float predictedValue = 0;
+					int k=0;
+					for(int t=0; t<topkSimUserList.size(); t++){
+						if(k<topK){
+							int simUserNo = topkSimUserList.get(t);
+							if(randomedMatrix[simUserNo][j]<0) continue; //simuser did not invoke the service before
+							else{
+								simAll += simMatrix[i][simUserNo];
+								predictedValue +=(randomedMatrix[simUserNo][j] - umean[simUserNo])*simMatrix[i][simUserNo];
+								k++;
+							}
+						}
+						else{
+							break;
+						}
+					}
+					if(k==0){
+						if (umean[i]>0)
+							predictedValue=umean[i];  //no sim user, use umean
+						else if(imean[i]>0)
+							predictedValue=imean[j];
+						else
+							predictedValue=-2;
+					}
+					else {
+						if(simAll>0){
+							predictedValue=predictedValue/simAll + umean[i];
+						}
+						else{
+							predictedValue= umean[i];
+						}
+						
+					}
+					predictedMatrix[i][j]=predictedValue;
+					continue;		
+				}
+				else{
+					predictedMatrix[i][j]=randomedMatrix[i][j];
+				}
+			}
+		}
+		return predictedMatrix;
+	}
+
+	private float[][] CAP(float[][] originalMatrix, float[][] randomedMatrix, float[] umean,
+			float[] imean, int userNumber, int itemNumber,int topK,
+			ArrayList<SimUserSet> simUserSetList, ArrayList<UserSetInItem> userSetInItemList) {
+		float[][] predictedMatrix = new float[userNumber][itemNumber];
+		
 		for(int i=0; i<userNumber; i++){
 			SimUserSet aSimUserSet = simUserSetList.get(i);
 			for(int j=0; j<itemNumber; j++){
@@ -159,7 +393,7 @@ public class Prediction {
 				}
 				//original
 				else if(randomedMatrix[i][j]==-2){
-					int topK=1;
+					
 					int simUserClusterCount=0;
 					float allClusterMean=0;
 					for(int u=0;u<aSimUserSet.getSimUserList().size();u++){
@@ -209,10 +443,34 @@ public class Prediction {
 				}
 			}
 		}
-		return  predictedMatrix;
-		
+		return predictedMatrix;
 	}
-	
+	private ArrayList<Integer> getTopKSimUser(double[] sim, int topK) {
+		if(topK>sim.length)
+			return null;
+		else{
+			int[] userIndex = new int[sim.length];
+			for(int i=0; i<sim.length; i++){
+				userIndex[i]=i;
+			}
+			for(int i=0; i<sim.length; i++){
+				for(int j=0; j<sim.length-1;j++){
+					if(sim[userIndex[j]]<sim[userIndex[j+1]]){
+						int temp = userIndex[j];
+						userIndex[j]=userIndex[j+1];
+						userIndex[j]=temp;
+					}
+				}
+			}
+			ArrayList<Integer> topKUserList=new ArrayList<Integer>();
+			for(int i=0; i<topK; i++){
+				topKUserList.add(userIndex[i]);
+			}
+			
+			return topKUserList;
+		}
+	}
+
 	public float[] getItemRtList(int itemNo, float[][] randomedMatrix, int userNumber){
 		float[] itemRtList = new float[userNumber];
 		for(int i=0; i<userNumber; i++){
@@ -386,14 +644,6 @@ public class Prediction {
 		return mae/allnmae;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
 	public double[] runUIPCC(float[][] originalMatrix, float[][] randomedMatrix, float density, int topK){
 		double mae_rmse_3method[] = new double[6];	
 		float[][] originalMatrixT = UtilityFunctions.matrixTransfer(originalMatrix);
@@ -474,7 +724,7 @@ public class Prediction {
 		float[][]result = new float[predictedMatrixUPCC.length][predictedMatrixUPCC[0].length];
 		for (int i = 0; i < predictedMatrixUPCC.length; i++) {
 			for (int j = 0; j < predictedMatrixUPCC[0].length; j++) {
-				result[i][j] = (float)(lambda * predictedMatrixUPCC[i][j] + (1 - lambda) * predictedMatrixIPCC[j][i]);
+				result[i][j] = (float)(lambda * predictedMatrixUPCC[i][j] + (1 - lambda) * predictedMatrixIPCC[i][j]);
 			}
 		}
 		return result;
@@ -703,6 +953,8 @@ public class Prediction {
 		}
 		return result;
 	}
+	
+	
 	
 
 

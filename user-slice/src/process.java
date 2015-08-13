@@ -11,6 +11,8 @@ public class process {
 	private ArrayList<SimUserSet> simUserSetList = new ArrayList<SimUserSet>();
 	private int userNumber = 339;
 	private int itemNumber = 5825;
+	
+	private int[][] MatrixB = new int[userNumber][userNumber];
 
 	public void preProcess() {
 		String prefix = "WSDream-QoSDataset2/";
@@ -117,20 +119,6 @@ public class process {
 			
 	}
 	
-	public void bulidSimUserSet (ArrayList<UserSetInUser> userList, ArrayList<Integer> unreliablelist){
-		for(int i=0; i<this.userNumber; i++){
-			UserSetInUser aUser = userList.get(i);
-			SimUserSet newClustedUser;
-			//for outlier
-			if(unreliablelist.contains(aUser.getUserNo())){
-				newClustedUser = new SimUserSet(aUser.getUserNo(),1);
-			}
-			else{
-				newClustedUser = new SimUserSet(aUser,unreliablelist);
-			}
-			simUserSetList.add(newClustedUser);
-		}
-	}
 	
 	public void printclustedUserList(){
 		for(int i = 0;i < 1;i++)
@@ -176,7 +164,7 @@ public class process {
 	
 	public static void main(String[] args) {
 		double mae_rmse_4method[][] = new double[21][12];
-		int loopNum = 20;
+		int loopNum = 1;
 		for(int count=0; count<loopNum; count++){
 			String prefix = "WSDream-QoSDataset2/";
 			String matrix = "rtMatrix";
@@ -204,8 +192,9 @@ public class process {
 //			
 //			System.arraycopy(mae_rmse_rap[0], 0, mae_rmse_4method[count], 0, 4);
 //			System.arraycopy(mae_rmse_rap[1], 0, mae_rmse_4method[count], 5, 4);
-			System.arraycopy(mae_rmse_uicluster, 0, mae_rmse_4method[count], 4, 1);
-			System.arraycopy(mae_rmse_uicluster, 1, mae_rmse_4method[count], 9, 1);
+			System.arraycopy(mae_rmse_uicluster, 0, mae_rmse_4method[count], 0, 1);
+			System.arraycopy(mae_rmse_uicluster, 1, mae_rmse_4method[count], 1, 1);
+			System.arraycopy(mae_rmse_uicluster, 2, mae_rmse_4method[count], 2, 1);
 
 			
 			System.out.println(count+": "+"mae__rmse_4method = \t"+mae_rmse_4method[count][0]+"\t"+mae_rmse_4method[count][1]+"\t"+mae_rmse_4method[count][2]+"\t"+mae_rmse_4method[count][3]
