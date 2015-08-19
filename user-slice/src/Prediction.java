@@ -18,13 +18,13 @@ public class Prediction {
 	private ArrayList<Integer> unRUL = new ArrayList<Integer>();
 	
 	public double[] runUICluster(float[][] originalMatrix, float[][] randomedMatrix,
-			float density, float random,int userNumber, int itemNumber, int K1){		
+			float density, float random,int userNumber, int itemNumber, int K1, int TK1, int TK2){		
 		
 		double nmae_2method[] = new double[3];	
 		float[][] originalMatrixT = UtilityFunctions.matrixTransfer(originalMatrix);
 		float[][] randomedMatrixT = UtilityFunctions.matrixTransfer(randomedMatrix);
-		ArrayList<float[][]> predictedMatrixListUser = UserCluser(originalMatrix, randomedMatrix, K1);
-		ArrayList<float[][]> predictedMatrixListItem = ItemCluser(originalMatrixT, randomedMatrixT, K1);
+		ArrayList<float[][]> predictedMatrixListUser = UserCluser(originalMatrix, randomedMatrix, K1, TK1);
+		ArrayList<float[][]> predictedMatrixListItem = ItemCluser(originalMatrixT, randomedMatrixT, K1, TK2);
 //		UtilityFunctions.writeMatrix(predictedMatrixUCluster, "RMSEResult/predicted/predictedMatrixUCluster.txt");
 
 		double mae_CAP = MAE(originalMatrix, randomedMatrix, predictedMatrixListUser.get(0));
@@ -62,7 +62,7 @@ public class Prediction {
 	}
 	
 	
-	public ArrayList<float[][]> UserCluser(float[][] originalMatrix, float[][] randomedMatrix, int K){
+	public ArrayList<float[][]> UserCluser(float[][] originalMatrix, float[][] randomedMatrix, int K, int TK1){
 		
 		int userNumber = originalMatrix.length;
 		int itemNumber = originalMatrix[0].length;
@@ -183,7 +183,7 @@ public class Prediction {
 //		System.out.println("Caculating begin: " + new Time(System.currentTimeMillis()));
 		ArrayList<float[][]> predictedMatrixList = new ArrayList<float[][]>();
 		
-		float [][] cap_predicted= CAP(originalMatrix, randomedMatrix, umean, imean, userNumber,itemNumber,2, simUserSetList, userSetInItemList);
+		float [][] cap_predicted= CAP(originalMatrix, randomedMatrix, umean, imean, userNumber,itemNumber, TK1, simUserSetList, userSetInItemList);
 //		float [][] cap_pagerank_predicted = CAP_PageRank(originalMatrix, randomedMatrix, umean, imean, simMatrix, userNumber, itemNumber);
 		
 		predictedMatrixList.add(cap_predicted);
@@ -195,7 +195,7 @@ public class Prediction {
 		
 	}
 	
-public ArrayList<float[][]> ItemCluser(float[][] originalMatrix, float[][] randomedMatrix, int K){
+public ArrayList<float[][]> ItemCluser(float[][] originalMatrix, float[][] randomedMatrix, int K, int TK2){
 		
 		int userNumber = originalMatrix.length;
 		int itemNumber = originalMatrix[0].length;
@@ -291,7 +291,7 @@ public ArrayList<float[][]> ItemCluser(float[][] originalMatrix, float[][] rando
 		ArrayList<float[][]> predictedMatrixList = new ArrayList<float[][]>();
 		
 		float [][] cap_predicted= CAP(originalMatrix, randomedMatrix, umean, imean, 
-				userNumber,itemNumber, 20 ,simUserSetList, userSetInItemList);
+				userNumber,itemNumber, TK2 ,simUserSetList, userSetInItemList);
 		cap_predicted = UtilityFunctions.matrixTransfer(cap_predicted);
 		predictedMatrixList.add(cap_predicted);
 //		UtilityFunctions.writeMatrix(cap_predicted, "simMatrix/cap-p-i.txt");
@@ -601,7 +601,7 @@ public ArrayList<float[][]> ItemCluser(float[][] originalMatrix, float[][] rando
 				}
 			}
 		}
-		UtilityFunctions.writeMatrix(allMAEMatrix, "RMSEResult/mae_ucluster.txt");
+//		UtilityFunctions.writeMatrix(allMAEMatrix, "RMSEResult/mae_ucluster.txt");
 		return allMAE/number;
 	}
 	
