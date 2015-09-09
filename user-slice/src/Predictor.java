@@ -769,7 +769,7 @@ public class Predictor {
 				}
 				Oj = ratedServiceKey.size();
 				for (int k = 0; k < Oj; k++) {
-					tmpURR += Math.abs(randomedMatrix[i][ratedServiceKey.get(k).intValue()] - rating[ratedServiceKey.get(k).intValue()]);
+					tmpURR += Math.abs(randomedMatrix[i][k] - rating[k]);
 				}
 				if (Oj > 0) {
 					tmpURR = (float)1 - (float)d * tmpURR / (float)Oj;
